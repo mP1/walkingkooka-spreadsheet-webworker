@@ -228,6 +228,9 @@
                     <includes>
                         <include>**/*.*</include>
                     </includes>
+                    <excludes>
+                        <exclude>walkingkooka-walkingkooka-spreadsheet-webworker.js</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -260,6 +263,62 @@
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>walkingkooka</groupId>
+                <artifactId>j2cl-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>walkingkooka-spreadsheet-webworker</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <classpath-scope>runtime</classpath-scope>
+                            <compilation-level>SIMPLE</compilation-level>
+                            <defines>
+                                <gwt.cspCompatModeEnabled>true</gwt.cspCompatModeEnabled>
+                                <gwt.enableDebugId>true</gwt.enableDebugId>
+                                <gwt.strictCspTestingEnabled>true</gwt.strictCspTestingEnabled>
+                                <jre.checkedMode>DISABLED</jre.checkedMode>
+                                <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
+                                <jsinterop.checks>DISABLED</jsinterop.checks>
+                                <!--
+                                  Minimal locales and timezones to improve build/load times.
+                                -->
+                                <walkingkooka.j2cl.java.util.locale.Locale.DEFAULT>EN-AU
+                                </walkingkooka.j2cl.java.util.locale.Locale.DEFAULT>
+                                <walkingkooka.j2cl.java.util.timezone.TimeZone.DEFAULT>Australia/Sydney
+                                </walkingkooka.j2cl.java.util.timezone.TimeZone.DEFAULT>
+                            </defines>
+                            <entry-points>walkingkooka.spreadsheet.webworker.Main</entry-points>
+                            <externs/>
+                            <formatting>
+                                <param>PRETTY_PRINT</param>
+                            </formatting>
+                            <java-compiler-arguments>
+                                <param>-Awalkingkooka.j2cl.java.util.Locale=,EN,EN-AU,EN-US</param>
+                                <param>-Awalkingkooka.j2cl.java.util.TimeZone=Australia/Sydney</param>
+                                <param>-Awalkingkooka.j2cl.locale.Logging=SLASH_SLASH_COMMENTS</param>
+                            </java-compiler-arguments>
+                            <language-out>ECMASCRIPT_2016</language-out>
+                            <thread-pool-size>0</thread-pool-size>
+                            <classpath-required/>
+                            <ignored-dependencies>
+                                <param>javax.servlet:javax.servlet-api:*</param>
+                                <param>org.junit.jupiter:junit-jupiter-engine:*</param>
+                                <param>org.junit.platform:junit-platform-commons:*</param>
+                                <param>org.junit.jupiter:junit-jupiter-api:*</param>
+                                <param>org.opentest4j:opentest4j:*</param>
+                                <param>walkingkooka:walkingkooka-net-header-apache-tika:*</param>
+                                <param>walkingkooka:walkingkooka-net-http-server-jetty:*</param>
+                            </ignored-dependencies>
+                            <javascript-source-required/>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
