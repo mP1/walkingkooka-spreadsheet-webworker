@@ -105,10 +105,12 @@ public final class Main implements EntryPoint {
     private static Function<Optional<Locale>, SpreadsheetMetadata> createMetadata(final String defaultLocale,
                                                                                   final SpreadsheetMetadataStore store) {
         final SpreadsheetMetadata metadataWithDefaults = SpreadsheetMetadata.NON_LOCALE_DEFAULTS
-                .set(SpreadsheetMetadataPropertyName.LOCALE, Locale.forLanguageTag(defaultLocale));
+                .set(SpreadsheetMetadataPropertyName.LOCALE, Locale.forLanguageTag(defaultLocale))
+                .loadFromLocale();
 
         return (locale) ->
-                store.save(locale.map(l -> metadataWithDefaults.set(SpreadsheetMetadataPropertyName.LOCALE, l).loadFromLocale()).orElse(metadataWithDefaults));
+                store.save(locale.map(l -> metadataWithDefaults.set(SpreadsheetMetadataPropertyName.LOCALE, l).loadFromLocale())
+                        .orElse(metadataWithDefaults));
 
     }
 
