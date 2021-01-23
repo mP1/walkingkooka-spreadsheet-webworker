@@ -10,13 +10,3 @@ A thin facade that handles messages exchanged between the main window which is a
 and the [spreadsheet](https://github.com/mP1/walkingkooka-spreadsheet).
 
 
-
-## Getting the source
-
-You can either download the source using the "ZIP" button at the top
-of the github page, or you can make a clone using git:
-
-```
-git clone git://github.com/mP1/walkingkooka-spreadsheet-webworker.git
-```
- 
