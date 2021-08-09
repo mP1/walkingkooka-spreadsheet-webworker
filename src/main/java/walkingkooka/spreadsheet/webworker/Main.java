@@ -45,28 +45,27 @@ import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStores;
+import walkingkooka.spreadsheet.reference.store.SpreadsheetCellRangeStores;
+import walkingkooka.spreadsheet.reference.store.SpreadsheetExpressionReferenceStores;
 import walkingkooka.spreadsheet.reference.store.SpreadsheetLabelStores;
-import walkingkooka.spreadsheet.reference.store.SpreadsheetRangeStores;
-import walkingkooka.spreadsheet.reference.store.SpreadsheetReferenceStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
-import walkingkooka.spreadsheet.server.SpreadsheetServer;
+import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
 import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.text.CharSequences;
 import walkingkooka.tree.expression.FunctionExpressionName;
+import walkingkooka.tree.expression.function.ExpressionFunction;
+import walkingkooka.tree.expression.function.ExpressionFunctionContext;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Starts the application as a webworker including waiting for messages from the main window.
@@ -87,15 +86,17 @@ public final class Main implements EntryPoint {
     static void startServer(final WorkerGlobalScope worker) {
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
 
-        final SpreadsheetServer server = SpreadsheetServer.with(UrlScheme.HTTP,
+        final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(UrlScheme.HTTP,
                 HostAddress.with("localhost"),
                 IpPort.HTTP,
                 createMetadata("en", metadataStore),
                 fractioner(),
-                idToFunctions(),
+                Main::idToFunctions,
                 idToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
                 fileServer(),
-                browserHttpServer(worker));
+                browserHttpServer(worker),
+                Main::spreadsheetMetadataStamper
+        );
         server.start();
     }
 
@@ -120,15 +121,15 @@ public final class Main implements EntryPoint {
         };
     }
 
-    private static Function<SpreadsheetId, BiFunction<FunctionExpressionName, List<Object>, Object>> idToFunctions() {
-        return (id) -> Main::functions;
+    private static Function<FunctionExpressionName, ExpressionFunction<?, ExpressionFunctionContext>> idToFunctions(final SpreadsheetId id) {
+        return Main::functions;
     }
 
     /**
      * TODO Implement a real function lookup, that only exposes functions that are enabled for a single spreadsheet.
      */
-    private static Object functions(final FunctionExpressionName functionName, final List<Object> parameters) {
-        throw new UnsupportedOperationException("Unknown function: " + functionName + "(" + parameters.stream().map(Object::toString).collect(Collectors.joining(",")) + ")");
+    private static ExpressionFunction<?, ExpressionFunctionContext> functions(final FunctionExpressionName functionName) {
+        throw new UnsupportedOperationException("Unknown function: " + functionName);
     }
 
     /**
@@ -152,13 +153,13 @@ public final class Main implements EntryPoint {
     private static Supplier<SpreadsheetStoreRepository> storeRepositorySupplier(final SpreadsheetMetadataStore metadataStore) {
         return () -> SpreadsheetStoreRepositories.basic(
                 SpreadsheetCellStores.treeMap(),
-                SpreadsheetReferenceStores.treeMap(),
+                SpreadsheetExpressionReferenceStores.treeMap(),
                 SpreadsheetGroupStores.treeMap(),
                 SpreadsheetLabelStores.treeMap(),
-                SpreadsheetReferenceStores.treeMap(),
+                SpreadsheetExpressionReferenceStores.treeMap(),
                 metadataStore,
-                SpreadsheetRangeStores.treeMap(),
-                SpreadsheetRangeStores.treeMap(),
+                SpreadsheetCellRangeStores.treeMap(),
+                SpreadsheetCellRangeStores.treeMap(),
                 SpreadsheetUserStores.treeMap());
     }
 
@@ -188,6 +189,10 @@ public final class Main implements EntryPoint {
         final UrlQueryString urlQueryString = UrlQueryString.with(queryString);
         final UrlParameterName parameter = UrlParameterName.with("targetOrigin");
         return urlQueryString.parameter(parameter).orElseThrow(() -> new IllegalArgumentException("Missing query parameter " + CharSequences.quoteAndEscape(parameter.value()) + " from " + queryString));
+    }
+
+    private static SpreadsheetMetadata spreadsheetMetadataStamper(final SpreadsheetMetadata metadata) {
+        return metadata;
     }
 
     /**
