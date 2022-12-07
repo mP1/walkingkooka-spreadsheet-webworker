@@ -39,6 +39,7 @@ import walkingkooka.net.http.server.HttpResponse;
 import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
+import walkingkooka.net.http.server.hateos.HateosContentType;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
@@ -47,19 +48,27 @@ import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStores;
 import walkingkooka.spreadsheet.reference.store.SpreadsheetCellRangeStores;
 import walkingkooka.spreadsheet.reference.store.SpreadsheetExpressionReferenceStores;
+import walkingkooka.spreadsheet.reference.store.SpreadsheetLabelStore;
 import walkingkooka.spreadsheet.reference.store.SpreadsheetLabelStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
+import walkingkooka.spreadsheet.server.context.SpreadsheetContexts;
 import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
+import walkingkooka.spreadsheet.store.SpreadsheetColumnStores;
+import walkingkooka.spreadsheet.store.SpreadsheetRowStores;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.text.CharSequences;
+import walkingkooka.text.Indentation;
+import walkingkooka.text.LineEnding;
+import walkingkooka.tree.expression.ExpressionEvaluationContext;
 import walkingkooka.tree.expression.FunctionExpressionName;
 import walkingkooka.tree.expression.function.ExpressionFunction;
-import walkingkooka.tree.expression.function.ExpressionFunctionContext;
+import walkingkooka.tree.expression.function.UnknownExpressionFunctionException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -86,16 +95,21 @@ public final class Main implements EntryPoint {
     static void startServer(final WorkerGlobalScope worker) {
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
 
-        final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(UrlScheme.HTTP,
+        final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
+                UrlScheme.HTTP,
                 HostAddress.with("localhost"),
                 IpPort.HTTP,
+                Indentation.SPACES2,
+                LineEnding.SYSTEM,
                 createMetadata("en", metadataStore),
                 fractioner(),
-                Main::idToFunctions,
+                idToFunctions(),
                 idToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
                 fileServer(),
                 browserHttpServer(worker),
-                Main::spreadsheetMetadataStamper
+                Main::spreadsheetMetadataStamper,
+                Main::contentTypeFactory,
+                LocalDateTime::now
         );
         server.start();
     }
@@ -121,15 +135,17 @@ public final class Main implements EntryPoint {
         };
     }
 
-    private static Function<FunctionExpressionName, ExpressionFunction<?, ExpressionFunctionContext>> idToFunctions(final SpreadsheetId id) {
+    private static Function<SpreadsheetId, Function<FunctionExpressionName, ExpressionFunction<?, ExpressionEvaluationContext>>> idToFunctions() {
         return Main::functions;
     }
 
     /**
      * TODO Implement a real function lookup, that only exposes functions that are enabled for a single spreadsheet.
      */
-    private static ExpressionFunction<?, ExpressionFunctionContext> functions(final FunctionExpressionName functionName) {
-        throw new UnsupportedOperationException("Unknown function: " + functionName);
+    private static Function<FunctionExpressionName, ExpressionFunction<?, ExpressionEvaluationContext>> functions(final SpreadsheetId id) {
+        return (n) -> {
+            throw new UnknownExpressionFunctionException(n);
+        };
     }
 
     /**
@@ -154,13 +170,16 @@ public final class Main implements EntryPoint {
         return () -> SpreadsheetStoreRepositories.basic(
                 SpreadsheetCellStores.treeMap(),
                 SpreadsheetExpressionReferenceStores.treeMap(),
+                SpreadsheetColumnStores.treeMap(),
                 SpreadsheetGroupStores.treeMap(),
                 SpreadsheetLabelStores.treeMap(),
                 SpreadsheetExpressionReferenceStores.treeMap(),
                 metadataStore,
                 SpreadsheetCellRangeStores.treeMap(),
                 SpreadsheetCellRangeStores.treeMap(),
-                SpreadsheetUserStores.treeMap());
+                SpreadsheetRowStores.treeMap(),
+                SpreadsheetUserStores.treeMap()
+        );
     }
 
     /**
@@ -192,7 +211,15 @@ public final class Main implements EntryPoint {
     }
 
     private static SpreadsheetMetadata spreadsheetMetadataStamper(final SpreadsheetMetadata metadata) {
-        return metadata;
+        return metadata.set(
+                SpreadsheetMetadataPropertyName.MODIFIED_DATE_TIME,
+                LocalDateTime.now()
+        );
+    }
+
+    private static HateosContentType contentTypeFactory(final SpreadsheetMetadata metadata,
+                                                        final SpreadsheetLabelStore labelStore) {
+        return SpreadsheetContexts.jsonHateosContentType(metadata, labelStore);
     }
 
     /**
