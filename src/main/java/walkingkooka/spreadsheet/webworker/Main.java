@@ -221,11 +221,4 @@ public final class Main implements EntryPoint {
                                                         final SpreadsheetLabelStore labelStore) {
         return SpreadsheetContexts.jsonHateosContentType(metadata, labelStore);
     }
-
-    /**
-     * Stop creation
-     */
-    private Main() {
-        throw new UnsupportedOperationException();
-    }
 }
