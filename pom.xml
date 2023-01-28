@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>walkingkooka-spreadsheet</name>
+    <name>walkingkooka-spreadsheet-webworker</name>
     <url>http://www.github.com/mP1/walkingkooka-spreadsheet-webworker</url>
 
     <properties>
@@ -122,6 +122,7 @@
                 </includes>
             </resource>
         </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -132,15 +133,16 @@
                     <target>9</target>
                     <compilerArgs>
                         <arg>-Awalkingkooka.j2cl.java.util.Currency=XXX</arg>
-                        <arg>-Awalkingkooka.j2cl.java.util.Locale=EN-AU</arg>
+                        <arg>-Awalkingkooka.j2cl.java.util.Locale=*</arg>
                         <arg>-Awalkingkooka.j2cl.java.util.Locale.DEFAULT=en-AU</arg>
-                        <arg>-Awalkingkooka.j2cl.java.util.TimeZone=Australia/*</arg>
+                        <arg>-Awalkingkooka.j2cl.java.util.TimeZone=Australia/Sydney</arg>
                         <arg>-Awalkingkooka.j2cl.java.util.TimeZone.DEFAULT=Australia/Sydney</arg>
                         <arg>-Awalkingkooka.j2cl.locale.Logging=SLASH_SLASH_COMMENTS</arg>
                     </compilerArgs>
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -152,10 +154,93 @@
                         <version>1.1.0</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>create walkingkooka-spreadsheet-webworker/temp</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>temp</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>walkingkooka</groupId>
+                <artifactId>walkingkooka-gwt-archive-maker-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>build walkingkooka-spreadsheet-webworker-gwt JAR</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <input>target/walkingkooka-spreadsheet-webworker-1.0-SNAPSHOT-temp.jar</input>
+                            <output>target/walkingkooka-spreadsheet-webworker-gwt-1.0-SNAPSHOT.jar</output>
+                            <pom-file>gwt-pom.xml</pom-file>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>install walkingkooka:walkingkooka-spreadsheet-webworker-gwt</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <groupId>walkingkooka</groupId>
+                            <artifactId>walkingkooka-spreadsheet-webworker-gwt</artifactId>
+                            <version>1.0-SNAPSHOT</version>
+                            <packaging>jar</packaging>
+                            <file>target/walkingkooka-spreadsheet-webworker-gwt-1.0-SNAPSHOT.jar</file>
+                            <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>install</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <trimStackTrace>false</trimStackTrace>
+                    <cloneProjectsTo>${project.build.directory}/it-tests</cloneProjectsTo>
+                    <debug>true</debug>
+                    <invokerPropertiesFile>src/it/invoker.properties</invokerPropertiesFile>
+                    <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+                    <settingsFile>src/it/settings.xml</settingsFile>
+                    <streamLogs>false</streamLogs>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -187,10 +272,12 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
+
                 <dependencies>
                     <dependency>
                         <groupId>javax.xml.bind</groupId>
@@ -200,52 +287,26 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
             <plugin>
-                <groupId>walkingkooka</groupId>
-                <artifactId>j2cl-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>walkingkooka-spreadsheet-webworker</id>
-                        <phase>prepare-package</phase>
+                        <id>deploy walkingkooka:walkingkooka-spreadsheet-webworker-gwt</id>
+                        <phase>deploy</phase>
                         <goals>
-                            <goal>build</goal>
+                            <goal>deploy-file</goal>
                         </goals>
                         <configuration>
-                            <classpath-scope>runtime</classpath-scope>
-                            <compilation-level>SIMPLE</compilation-level>
-                            <defines>
-                                <gwt.cspCompatModeEnabled>true</gwt.cspCompatModeEnabled>
-                                <gwt.enableDebugId>true</gwt.enableDebugId>
-                                <gwt.strictCspTestingEnabled>true</gwt.strictCspTestingEnabled>
-                                <jre.checkedMode>DISABLED</jre.checkedMode>
-                                <jre.checks.checkLevel>MINIMAL</jre.checks.checkLevel>
-                                <jsinterop.checks>DISABLED</jsinterop.checks>
-                            </defines>
-                            <entry-points>walkingkooka.spreadsheet.webworker.Main</entry-points>
-                            <externs/>
-                            <formatting>
-                                <param>PRETTY_PRINT</param>
-                            </formatting>
-                            <java-compiler-arguments>
-                                <param>-Awalkingkooka.j2cl.java.util.Currency=XXX</param>
-                                <param>-Awalkingkooka.j2cl.java.util.Locale=EN-AU</param>
-                                <param>-Awalkingkooka.j2cl.java.util.Locale.DEFAULT=en-AU</param>
-                                <param>-Awalkingkooka.j2cl.java.util.TimeZone=Australia/*</param>
-                                <param>-Awalkingkooka.j2cl.java.util.TimeZone.DEFAULT=Australia/Sydney</param>
-                                <param>-Awalkingkooka.j2cl.locale.Logging=SLASH_SLASH_COMMENTS</param>
-                            </java-compiler-arguments>
-                            <language-out>ECMASCRIPT_2016</language-out>
-                            <thread-pool-size>0</thread-pool-size>
-                            <classpath-required/>
-                            <ignored-dependencies>
-                                <param>javax.servlet:javax.servlet-api:*</param>
-                                <param>org.junit.jupiter:junit-jupiter-engine:*</param>
-                                <param>org.junit.platform:junit-platform-commons:*</param>
-                                <param>org.junit.jupiter:junit-jupiter-api:*</param>
-                                <param>org.opentest4j:opentest4j:*</param>
-                            </ignored-dependencies>
-                            <javascript-source-required/>
+                            <groupId>walkingkooka</groupId>
+                            <artifactId>walkingkooka-spreadsheet-webworker-gwt</artifactId>
+                            <version>1.0-SNAPSHOT</version>
+                            <packaging>jar</packaging>
+                            <file>target/walkingkooka-spreadsheet-webworker-gwt-1.0-SNAPSHOT.jar</file>
+                            <url>https://maven-repo-254709.appspot.com</url>
+                            <repositoryId>github-mp1-appengine-repo</repositoryId>
                         </configuration>
                     </execution>
                 </executions>

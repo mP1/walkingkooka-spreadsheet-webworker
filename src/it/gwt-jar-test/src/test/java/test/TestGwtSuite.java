@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Miroslav Pokorny
+ * Copyright © 2019 The GWT Project Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,9 @@
  */
 package test;
 
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-import com.google.j2cl.junit.apt.J2clTestInput;
-import org.junit.Assert;
-import org.junit.Test;
-import walkingkooka.spreadsheet.webworker.Main;
-
-@J2clTestInput(JunitTest.class)
-public class JunitTest {
-
-    @Test
-    public void testStart() {
-        try {
-            new Main().onModuleLoad();
-            Assert.fail("Exception should have been thrown");
-        } catch (final Exception expected) {
-        }
-    }
-}
+@RunWith(Suite.class)
+@Suite.SuiteClasses({TestGwtTest.class})
+public class TestGwtSuite {}
