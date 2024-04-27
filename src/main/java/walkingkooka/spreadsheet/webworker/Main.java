@@ -42,14 +42,15 @@ import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.net.http.server.hateos.HateosContentType;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetId;
+import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStores;
-import walkingkooka.spreadsheet.reference.store.SpreadsheetCellRangeStores;
-import walkingkooka.spreadsheet.reference.store.SpreadsheetExpressionReferenceStores;
-import walkingkooka.spreadsheet.reference.store.SpreadsheetLabelStore;
-import walkingkooka.spreadsheet.reference.store.SpreadsheetLabelStores;
+import walkingkooka.spreadsheet.store.SpreadsheetCellRangeStores;
+import walkingkooka.spreadsheet.store.SpreadsheetExpressionReferenceStores;
+import walkingkooka.spreadsheet.store.SpreadsheetLabelStore;
+import walkingkooka.spreadsheet.store.SpreadsheetLabelStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
@@ -62,10 +63,8 @@ import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
-import walkingkooka.tree.expression.ExpressionEvaluationContext;
-import walkingkooka.tree.expression.FunctionExpressionName;
-import walkingkooka.tree.expression.function.ExpressionFunction;
-import walkingkooka.tree.expression.function.UnknownExpressionFunctionException;
+import walkingkooka.tree.expression.function.provider.ExpressionFunctionProvider;
+import walkingkooka.tree.expression.function.provider.ExpressionFunctionProviders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -101,15 +100,17 @@ public final class Main implements EntryPoint {
                 IpPort.HTTP,
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
+                LocalDateTime::now,
                 createMetadata("en", metadataStore),
-                fractioner(),
-                idToFunctions(),
-                idToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
-                fileServer(),
-                browserHttpServer(worker),
+                metadataStore,
                 Main::spreadsheetMetadataStamper,
+                fractioner(),
+                (id) -> SpreadsheetComparatorProviders.builtIn(),
+                spreadsheetIdToExpressionFunctionProvider(),
+                spreadsheetIdToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
                 Main::contentTypeFactory,
-                LocalDateTime::now
+                fileServer(),
+                browserHttpServer(worker)
         );
         server.start();
     }
@@ -135,24 +136,15 @@ public final class Main implements EntryPoint {
         };
     }
 
-    private static Function<SpreadsheetId, Function<FunctionExpressionName, ExpressionFunction<?, ExpressionEvaluationContext>>> idToFunctions() {
-        return Main::functions;
-    }
-
-    /**
-     * TODO Implement a real function lookup, that only exposes functions that are enabled for a single spreadsheet.
-     */
-    private static Function<FunctionExpressionName, ExpressionFunction<?, ExpressionEvaluationContext>> functions(final SpreadsheetId id) {
-        return (n) -> {
-            throw new UnknownExpressionFunctionException(n);
-        };
+    private static Function<SpreadsheetId, ExpressionFunctionProvider> spreadsheetIdToExpressionFunctionProvider() {
+        return (id) -> ExpressionFunctionProviders.fake();
     }
 
     /**
      * Retrieves from the cache or lazily creates a {@link SpreadsheetStoreRepository} for the given {@link SpreadsheetId}.
      */
-    private static Function<SpreadsheetId, SpreadsheetStoreRepository> idToRepository(final Map<SpreadsheetId, SpreadsheetStoreRepository> idToRepository,
-                                                                                      final Supplier<SpreadsheetStoreRepository> repositoryFactory) {
+    private static Function<SpreadsheetId, SpreadsheetStoreRepository> spreadsheetIdToRepository(final Map<SpreadsheetId, SpreadsheetStoreRepository> idToRepository,
+                                                                                                 final Supplier<SpreadsheetStoreRepository> repositoryFactory) {
         return (id) -> {
             SpreadsheetStoreRepository repository = idToRepository.get(id);
             if (null == repository) {
@@ -205,7 +197,7 @@ public final class Main implements EntryPoint {
      * Retrieves the targetOrigin query parameter, failing if it is absent.
      */
     private static String targetOrigin(final String queryString) {
-        final UrlQueryString urlQueryString = UrlQueryString.with(queryString);
+        final UrlQueryString urlQueryString = UrlQueryString.parse(queryString);
         final UrlParameterName parameter = UrlParameterName.with("targetOrigin");
         return urlQueryString.parameter(parameter).orElseThrow(() -> new IllegalArgumentException("Missing query parameter " + CharSequences.quoteAndEscape(parameter.value()) + " from " + queryString));
     }
