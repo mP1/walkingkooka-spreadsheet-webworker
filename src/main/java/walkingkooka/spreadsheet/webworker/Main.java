@@ -25,6 +25,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.collect.map.Maps;
+import walkingkooka.convert.provider.ConverterProviders;
 import walkingkooka.math.Fraction;
 import walkingkooka.net.HostAddress;
 import walkingkooka.net.IpPort;
@@ -34,19 +35,23 @@ import walkingkooka.net.UrlQueryString;
 import walkingkooka.net.UrlScheme;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
+import walkingkooka.net.http.server.HttpHandler;
 import walkingkooka.net.http.server.HttpRequest;
 import walkingkooka.net.http.server.HttpResponse;
 import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
-import walkingkooka.net.http.server.hateos.HateosContentType;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
+import walkingkooka.spreadsheet.format.SpreadsheetFormatterProvider;
+import walkingkooka.spreadsheet.format.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStores;
+import walkingkooka.spreadsheet.parser.SpreadsheetParserProvider;
+import walkingkooka.spreadsheet.parser.SpreadsheetParserProviders;
 import walkingkooka.spreadsheet.store.SpreadsheetCellRangeStores;
 import walkingkooka.spreadsheet.store.SpreadsheetExpressionReferenceStores;
 import walkingkooka.spreadsheet.store.SpreadsheetLabelStore;
@@ -54,7 +59,6 @@ import walkingkooka.spreadsheet.store.SpreadsheetLabelStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
-import walkingkooka.spreadsheet.server.context.SpreadsheetContexts;
 import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
 import walkingkooka.spreadsheet.store.SpreadsheetColumnStores;
 import walkingkooka.spreadsheet.store.SpreadsheetRowStores;
@@ -63,10 +67,14 @@ import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
+import walkingkooka.tree.expression.ExpressionNumberKind;
 import walkingkooka.tree.expression.function.provider.ExpressionFunctionProvider;
 import walkingkooka.tree.expression.function.provider.ExpressionFunctionProviders;
+import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
+import walkingkooka.tree.json.marshall.JsonNodeUnmarshallContexts;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
@@ -105,10 +113,17 @@ public final class Main implements EntryPoint {
                 metadataStore,
                 Main::spreadsheetMetadataStamper,
                 fractioner(),
-                (id) -> SpreadsheetComparatorProviders.builtIn(),
-                spreadsheetIdToExpressionFunctionProvider(),
+                JsonNodeMarshallContexts.basic(),
+                JsonNodeUnmarshallContexts.basic(
+                        ExpressionNumberKind.DEFAULT,
+                        MathContext.DECIMAL32
+                ),
+                (id) -> ConverterProviders.fake(),
+                (id) -> SpreadsheetComparatorProviders.spreadsheetComparators(),
+                (id) -> SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
+                (id) -> ExpressionFunctionProviders.fake(),
+                (id) -> SpreadsheetParserProviders.spreadsheetParsePattern(),
                 spreadsheetIdToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
-                Main::contentTypeFactory,
                 fileServer(),
                 browserHttpServer(worker)
         );
@@ -134,10 +149,6 @@ public final class Main implements EntryPoint {
         return (n) -> {
             throw new UnsupportedOperationException();
         };
-    }
-
-    private static Function<SpreadsheetId, ExpressionFunctionProvider> spreadsheetIdToExpressionFunctionProvider() {
-        return (id) -> ExpressionFunctionProviders.fake();
     }
 
     /**
@@ -184,10 +195,11 @@ public final class Main implements EntryPoint {
     /**
      * Creates a {@link BrowserHttpServers}.
      */
-    private static Function<BiConsumer<HttpRequest, HttpResponse>, HttpServer> browserHttpServer(final WorkerGlobalScope worker) {
+    private static Function<HttpHandler, HttpServer> browserHttpServer(final WorkerGlobalScope worker) {
         final MessagePort port = Js.uncheckedCast(worker);
 
-        return (processor) -> BrowserHttpServers.messagePort(processor,
+        return (processor) -> BrowserHttpServers.messagePort(
+                processor,
                 port,
                 Predicates.always(),
                 targetOrigin(worker.getLocation().getSearch())); // TODO accept parameter.
@@ -207,10 +219,5 @@ public final class Main implements EntryPoint {
                 SpreadsheetMetadataPropertyName.MODIFIED_DATE_TIME,
                 LocalDateTime.now()
         );
-    }
-
-    private static HateosContentType contentTypeFactory(final SpreadsheetMetadata metadata,
-                                                        final SpreadsheetLabelStore labelStore) {
-        return SpreadsheetContexts.jsonHateosContentType(metadata, labelStore);
     }
 }
