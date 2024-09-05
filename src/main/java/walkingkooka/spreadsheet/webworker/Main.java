@@ -42,7 +42,10 @@ import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
+import walkingkooka.spreadsheet.export.SpreadsheetExporterProvider;
+import walkingkooka.spreadsheet.export.SpreadsheetExporterProviders;
 import walkingkooka.spreadsheet.format.SpreadsheetFormatterProviders;
+import walkingkooka.spreadsheet.importer.SpreadsheetImporterProviders;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
@@ -116,7 +119,9 @@ public final class Main implements EntryPoint {
                         ConverterProviders.converters(),
                         ExpressionFunctionProviders.empty(),
                         SpreadsheetComparatorProviders.spreadsheetComparators(),
+                        SpreadsheetExporterProviders.spreadsheetExport(),
                         SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
+                        SpreadsheetImporterProviders.spreadsheetImport(),
                         SpreadsheetParserProviders.spreadsheetParsePattern(
                                 SpreadsheetFormatterProviders.spreadsheetFormatPattern()
                         )
