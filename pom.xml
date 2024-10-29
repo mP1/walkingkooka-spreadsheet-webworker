@@ -148,6 +148,12 @@
 
         <dependency>
             <groupId>walkingkooka</groupId>
+            <artifactId>walkingkooka-spreadsheet-expression-function</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>walkingkooka</groupId>
             <artifactId>walkingkooka-spreadsheet-server</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
