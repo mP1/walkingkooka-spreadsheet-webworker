@@ -26,7 +26,6 @@ import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.convert.provider.ConverterProviders;
-import walkingkooka.math.Fraction;
 import walkingkooka.net.HostAddress;
 import walkingkooka.net.IpPort;
 import walkingkooka.net.UrlParameterName;
@@ -42,15 +41,19 @@ import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
-import walkingkooka.spreadsheet.export.SpreadsheetExporterProvider;
+import walkingkooka.spreadsheet.convert.SpreadsheetConvertersConverterProviders;
 import walkingkooka.spreadsheet.export.SpreadsheetExporterProviders;
+import walkingkooka.spreadsheet.expression.function.SpreadsheetExpressionFunctionProviders;
+import walkingkooka.spreadsheet.format.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.SpreadsheetImporterProviders;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStores;
+import walkingkooka.spreadsheet.parser.SpreadsheetParserProvider;
 import walkingkooka.spreadsheet.parser.SpreadsheetParserProviders;
+import walkingkooka.spreadsheet.provider.SpreadsheetProvider;
 import walkingkooka.spreadsheet.provider.SpreadsheetProviders;
 import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
@@ -63,6 +66,7 @@ import walkingkooka.spreadsheet.store.SpreadsheetLabelStores;
 import walkingkooka.spreadsheet.store.SpreadsheetRowStores;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
+import walkingkooka.text.CaseSensitivity;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
@@ -71,7 +75,6 @@ import walkingkooka.tree.expression.function.provider.ExpressionFunctionProvider
 import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeUnmarshallContexts;
 
-import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -106,10 +109,10 @@ public final class Main implements EntryPoint {
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
                 LocalDateTime::now,
+                systemSpreadsheetProvider(),
                 createMetadata("en", metadataStore),
                 metadataStore,
                 Main::spreadsheetMetadataStamper,
-                fractioner(),
                 JsonNodeMarshallContexts.basic(),
                 JsonNodeUnmarshallContexts.basic(
                         ExpressionNumberKind.DEFAULT,
@@ -134,6 +137,30 @@ public final class Main implements EntryPoint {
         server.start();
     }
 
+    private static SpreadsheetProvider systemSpreadsheetProvider() {
+        final SpreadsheetFormatterProvider spreadsheetFormatterProvider = SpreadsheetFormatterProviders.spreadsheetFormatPattern();
+        final SpreadsheetParserProvider spreadsheetParserProvider = SpreadsheetParserProviders.spreadsheetParsePattern(
+                spreadsheetFormatterProvider
+        );
+
+        return SpreadsheetProviders.basic(
+                SpreadsheetConvertersConverterProviders.spreadsheetConverters(
+                        SpreadsheetMetadata.EMPTY.set(
+                                SpreadsheetMetadataPropertyName.LOCALE,
+                                Locale.forLanguageTag("EN-AU")
+                        ),
+                        spreadsheetFormatterProvider,
+                        spreadsheetParserProvider
+                ), // converterProvider
+                SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(CaseSensitivity.INSENSITIVE),
+                SpreadsheetComparatorProviders.spreadsheetComparators(),
+                SpreadsheetExporterProviders.spreadsheetExport(),
+                spreadsheetFormatterProvider,
+                SpreadsheetImporterProviders.spreadsheetImport(),
+                spreadsheetParserProvider
+        );
+    }
+
     /**
      * Creates a function which merges the given {@link Locale} and then saves it to the {@link SpreadsheetMetadataStore}.
      */
@@ -147,12 +174,6 @@ public final class Main implements EntryPoint {
                 store.save(locale.map(l -> metadataWithDefaults.set(SpreadsheetMetadataPropertyName.LOCALE, l).loadFromLocale())
                         .orElse(metadataWithDefaults));
 
-    }
-
-    private static Function<BigDecimal, Fraction> fractioner() {
-        return (n) -> {
-            throw new UnsupportedOperationException();
-        };
     }
 
     /**
