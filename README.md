@@ -4,7 +4,7 @@
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/mP1/walkingkooka-spreadsheet-webworker.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mP1/walkingkooka-spreadsheet-webworker/context:java)
 ![](https://tokei.rs/b1/github/mP1/walkingkooka-spreadsheet-webworker)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/mP1/walkingkooka-spreadsheet-webworker.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/mP1/walkingkooka-spreadsheet-webworker/alerts/)
-
+[![J2CL compatible](https://img.shields.io/badge/J2CL-compatible-brightgreen.svg)](https://github.com/mP1/j2cl-central)
 
 
 A thin facade that handles messages exchanged between the main window which is a [javascript react web application](https://github.com/mP1/walkingkooka-spreadsheet-react)
