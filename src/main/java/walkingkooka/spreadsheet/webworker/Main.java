@@ -39,6 +39,7 @@ import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.predicate.Predicates;
+import walkingkooka.spreadsheet.SpreadsheetExpressionFunctionNames;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.SpreadsheetConvertersConverterProviders;
@@ -73,6 +74,7 @@ import walkingkooka.text.LineEnding;
 import walkingkooka.tree.expression.ExpressionNumberKind;
 import walkingkooka.tree.expression.function.provider.ExpressionFunctionProviders;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
+import walkingkooka.tree.json.marshall.JsonNodeMarshallUnmarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeUnmarshallContexts;
 
 import java.math.MathContext;
@@ -112,15 +114,18 @@ public final class Main implements EntryPoint {
                 systemSpreadsheetProvider(),
                 createMetadata("en", metadataStore),
                 metadataStore,
-                Main::spreadsheetMetadataStamper,
-                JsonNodeMarshallContexts.basic(),
-                JsonNodeUnmarshallContexts.basic(
-                        ExpressionNumberKind.DEFAULT,
-                        MathContext.DECIMAL32
+                JsonNodeMarshallUnmarshallContexts.basic(
+                        JsonNodeMarshallContexts.basic(),
+                        JsonNodeUnmarshallContexts.basic(
+                                ExpressionNumberKind.DEFAULT,
+                                MathContext.DECIMAL32
+                        )
                 ),
                 (id) -> SpreadsheetProviders.basic(
                         ConverterProviders.converters(),
-                        ExpressionFunctionProviders.empty(),
+                        ExpressionFunctionProviders.empty(
+                                SpreadsheetExpressionFunctionNames.CASE_SENSITIVITY
+                        ),
                         SpreadsheetComparatorProviders.spreadsheetComparators(),
                         SpreadsheetExporterProviders.spreadsheetExport(),
                         SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
