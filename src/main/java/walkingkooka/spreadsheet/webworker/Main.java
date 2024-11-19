@@ -26,12 +26,10 @@ import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.convert.provider.ConverterProviders;
-import walkingkooka.net.HostAddress;
-import walkingkooka.net.IpPort;
+import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
 import walkingkooka.net.UrlQueryString;
-import walkingkooka.net.UrlScheme;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
 import walkingkooka.net.http.server.HttpHandler;
@@ -105,9 +103,7 @@ public final class Main implements EntryPoint {
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
-                UrlScheme.HTTP,
-                HostAddress.with("localhost"),
-                IpPort.HTTP,
+                Url.parseAbsolute("http://localhost"),
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
                 LocalDateTime::now,
