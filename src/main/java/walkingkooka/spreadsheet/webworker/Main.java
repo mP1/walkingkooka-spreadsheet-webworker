@@ -100,13 +100,20 @@ public final class Main implements EntryPoint {
 
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
-        final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
+        final Supplier<LocalDateTime> now = LocalDateTime::now;
+        final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap(
+                SpreadsheetMetadata.EMPTY.set(
+                        SpreadsheetMetadataPropertyName.LOCALE,
+                        Locale.forLanguageTag("EN-AU")
+                ),
+                now
+        );
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
                 Url.parseAbsolute("http://localhost"),
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
-                LocalDateTime::now,
+                now,
                 systemSpreadsheetProvider(),
                 createMetadata("en", metadataStore),
                 metadataStore,
