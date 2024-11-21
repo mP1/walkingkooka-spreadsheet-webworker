@@ -79,7 +79,6 @@ import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -115,7 +114,6 @@ public final class Main implements EntryPoint {
                 LineEnding.SYSTEM,
                 now,
                 systemSpreadsheetProvider(),
-                createMetadata("en", metadataStore),
                 metadataStore,
                 JsonNodeMarshallUnmarshallContexts.basic(
                         JsonNodeMarshallContexts.basic(),
@@ -167,21 +165,6 @@ public final class Main implements EntryPoint {
                 SpreadsheetImporterProviders.spreadsheetImport(),
                 spreadsheetParserProvider
         );
-    }
-
-    /**
-     * Creates a function which merges the given {@link Locale} and then saves it to the {@link SpreadsheetMetadataStore}.
-     */
-    private static Function<Optional<Locale>, SpreadsheetMetadata> createMetadata(final String defaultLocale,
-                                                                                  final SpreadsheetMetadataStore store) {
-        final SpreadsheetMetadata metadataWithDefaults = SpreadsheetMetadata.NON_LOCALE_DEFAULTS
-                .set(SpreadsheetMetadataPropertyName.LOCALE, Locale.forLanguageTag(defaultLocale))
-                .loadFromLocale();
-
-        return (locale) ->
-                store.save(locale.map(l -> metadataWithDefaults.set(SpreadsheetMetadataPropertyName.LOCALE, l).loadFromLocale())
-                        .orElse(metadataWithDefaults));
-
     }
 
     /**
