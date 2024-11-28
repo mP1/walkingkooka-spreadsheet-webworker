@@ -26,6 +26,8 @@ import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.collect.map.Maps;
 import walkingkooka.convert.provider.ConverterProviders;
+import walkingkooka.datetime.HasNow;
+import walkingkooka.environment.EnvironmentContexts;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
@@ -36,6 +38,9 @@ import walkingkooka.net.http.server.HttpHandler;
 import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
+import walkingkooka.net.http.server.hateos.HateosResourceHandlerContexts;
+import walkingkooka.plugin.ProviderContexts;
+import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetExpressionFunctionNames;
 import walkingkooka.spreadsheet.SpreadsheetId;
@@ -99,7 +104,7 @@ public final class Main implements EntryPoint {
 
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
-        final Supplier<LocalDateTime> now = LocalDateTime::now;
+        final HasNow now = LocalDateTime::now;
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap(
                 SpreadsheetMetadata.EMPTY.set(
                         SpreadsheetMetadataPropertyName.LOCALE,
@@ -112,14 +117,19 @@ public final class Main implements EntryPoint {
                 Url.parseAbsolute("http://localhost"),
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
-                now,
                 systemSpreadsheetProvider(),
+                ProviderContexts.basic(
+                        EnvironmentContexts.empty(now),
+                        PluginStores.treeMap()
+                ),
                 metadataStore,
-                JsonNodeMarshallUnmarshallContexts.basic(
-                        JsonNodeMarshallContexts.basic(),
-                        JsonNodeUnmarshallContexts.basic(
-                                ExpressionNumberKind.DEFAULT,
-                                MathContext.DECIMAL32
+                HateosResourceHandlerContexts.basic(
+                        JsonNodeMarshallUnmarshallContexts.basic(
+                                JsonNodeMarshallContexts.basic(),
+                                JsonNodeUnmarshallContexts.basic(
+                                        ExpressionNumberKind.DEFAULT,
+                                        MathContext.DECIMAL32
+                                )
                         )
                 ),
                 (id) -> SpreadsheetProviders.basic(
