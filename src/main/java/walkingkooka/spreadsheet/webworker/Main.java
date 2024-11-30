@@ -32,6 +32,7 @@ import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
 import walkingkooka.net.UrlQueryString;
+import walkingkooka.net.email.EmailAddress;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
 import walkingkooka.net.http.server.HttpHandler;
@@ -84,6 +85,7 @@ import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -119,7 +121,12 @@ public final class Main implements EntryPoint {
                 LineEnding.SYSTEM,
                 systemSpreadsheetProvider(),
                 ProviderContexts.basic(
-                        EnvironmentContexts.empty(now),
+                        EnvironmentContexts.empty(
+                                now,
+                                Optional.of(
+                                        EmailAddress.parse("user123@example.com")
+                                )
+                        ),
                         PluginStores.treeMap()
                 ),
                 metadataStore,
