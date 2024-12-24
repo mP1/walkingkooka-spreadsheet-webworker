@@ -33,6 +33,7 @@ import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
 import walkingkooka.net.UrlQueryString;
 import walkingkooka.net.email.EmailAddress;
+import walkingkooka.net.header.MediaTypeDetectors;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
 import walkingkooka.net.http.server.HttpHandler;
@@ -119,6 +120,7 @@ public final class Main implements EntryPoint {
                 Url.parseAbsolute("http://localhost"),
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
+                MediaTypeDetectors.fake(),
                 systemSpreadsheetProvider(),
                 ProviderContexts.basic(
                         EnvironmentContexts.empty(
