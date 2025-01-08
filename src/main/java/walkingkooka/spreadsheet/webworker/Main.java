@@ -102,62 +102,62 @@ public final class Main implements EntryPoint {
     /**
      * Elemental appears to be missing a getter or field that returns a {@link WorkerGlobalScope}
      */
-    @JsMethod(name="self", namespace= JsPackage.GLOBAL)
+    @JsMethod(name = "self", namespace = JsPackage.GLOBAL)
     private static native WorkerGlobalScope self();
 
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
         final HasNow now = LocalDateTime::now;
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap(
-                SpreadsheetMetadata.EMPTY.set(
-                        SpreadsheetMetadataPropertyName.LOCALE,
-                        Locale.forLanguageTag("EN-AU")
-                ),
-                now
+            SpreadsheetMetadata.EMPTY.set(
+                SpreadsheetMetadataPropertyName.LOCALE,
+                Locale.forLanguageTag("EN-AU")
+            ),
+            now
         );
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
-                Url.parseAbsolute("http://localhost"),
-                Indentation.SPACES2,
-                LineEnding.SYSTEM,
-                MediaTypeDetectors.fake(),
-                systemSpreadsheetProvider(),
-                ProviderContexts.basic(
-                        EnvironmentContexts.empty(
-                                now,
-                                Optional.of(
-                                        EmailAddress.parse("user123@example.com")
-                                )
-                        ),
-                        PluginStores.treeMap()
+            Url.parseAbsolute("http://localhost"),
+            Indentation.SPACES2,
+            LineEnding.SYSTEM,
+            MediaTypeDetectors.fake(),
+            systemSpreadsheetProvider(),
+            ProviderContexts.basic(
+                EnvironmentContexts.empty(
+                    now,
+                    Optional.of(
+                        EmailAddress.parse("user123@example.com")
+                    )
                 ),
-                metadataStore,
-                HateosResourceHandlerContexts.basic(
-                        JsonNodeMarshallUnmarshallContexts.basic(
-                                JsonNodeMarshallContexts.basic(),
-                                JsonNodeUnmarshallContexts.basic(
-                                        ExpressionNumberKind.DEFAULT,
-                                        MathContext.DECIMAL32
-                                )
-                        )
+                PluginStores.treeMap()
+            ),
+            metadataStore,
+            HateosResourceHandlerContexts.basic(
+                JsonNodeMarshallUnmarshallContexts.basic(
+                    JsonNodeMarshallContexts.basic(),
+                    JsonNodeUnmarshallContexts.basic(
+                        ExpressionNumberKind.DEFAULT,
+                        MathContext.DECIMAL32
+                    )
+                )
+            ),
+            (id) -> SpreadsheetProviders.basic(
+                ConverterProviders.converters(),
+                ExpressionFunctionProviders.empty(
+                    SpreadsheetExpressionFunctionNames.CASE_SENSITIVITY
                 ),
-                (id) -> SpreadsheetProviders.basic(
-                        ConverterProviders.converters(),
-                        ExpressionFunctionProviders.empty(
-                                SpreadsheetExpressionFunctionNames.CASE_SENSITIVITY
-                        ),
-                        SpreadsheetComparatorProviders.spreadsheetComparators(),
-                        SpreadsheetExporterProviders.spreadsheetExport(),
-                        SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
-                        SpreadsheetImporterProviders.spreadsheetImport(),
-                        SpreadsheetParserProviders.spreadsheetParsePattern(
-                                SpreadsheetFormatterProviders.spreadsheetFormatPattern()
-                        )
+                SpreadsheetComparatorProviders.spreadsheetComparators(),
+                SpreadsheetExporterProviders.spreadsheetExport(),
+                SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
+                SpreadsheetImporterProviders.spreadsheetImport(),
+                SpreadsheetParserProviders.spreadsheetParsePattern(
+                    SpreadsheetFormatterProviders.spreadsheetFormatPattern()
+                )
 
-                ),
-                spreadsheetIdToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
-                fileServer(),
-                browserHttpServer(worker)
+            ),
+            spreadsheetIdToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
+            fileServer(),
+            browserHttpServer(worker)
         );
         server.start();
     }
@@ -165,24 +165,24 @@ public final class Main implements EntryPoint {
     private static SpreadsheetProvider systemSpreadsheetProvider() {
         final SpreadsheetFormatterProvider spreadsheetFormatterProvider = SpreadsheetFormatterProviders.spreadsheetFormatPattern();
         final SpreadsheetParserProvider spreadsheetParserProvider = SpreadsheetParserProviders.spreadsheetParsePattern(
-                spreadsheetFormatterProvider
+            spreadsheetFormatterProvider
         );
 
         return SpreadsheetProviders.basic(
-                SpreadsheetConvertersConverterProviders.spreadsheetConverters(
-                        SpreadsheetMetadata.EMPTY.set(
-                                SpreadsheetMetadataPropertyName.LOCALE,
-                                Locale.forLanguageTag("EN-AU")
-                        ),
-                        spreadsheetFormatterProvider,
-                        spreadsheetParserProvider
-                ), // converterProvider
-                SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(CaseSensitivity.INSENSITIVE),
-                SpreadsheetComparatorProviders.spreadsheetComparators(),
-                SpreadsheetExporterProviders.spreadsheetExport(),
+            SpreadsheetConvertersConverterProviders.spreadsheetConverters(
+                SpreadsheetMetadata.EMPTY.set(
+                    SpreadsheetMetadataPropertyName.LOCALE,
+                    Locale.forLanguageTag("EN-AU")
+                ),
                 spreadsheetFormatterProvider,
-                SpreadsheetImporterProviders.spreadsheetImport(),
                 spreadsheetParserProvider
+            ), // converterProvider
+            SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(CaseSensitivity.INSENSITIVE),
+            SpreadsheetComparatorProviders.spreadsheetComparators(),
+            SpreadsheetExporterProviders.spreadsheetExport(),
+            spreadsheetFormatterProvider,
+            SpreadsheetImporterProviders.spreadsheetImport(),
+            spreadsheetParserProvider
         );
     }
 
@@ -206,17 +206,17 @@ public final class Main implements EntryPoint {
      */
     private static Supplier<SpreadsheetStoreRepository> storeRepositorySupplier(final SpreadsheetMetadataStore metadataStore) {
         return () -> SpreadsheetStoreRepositories.basic(
-                SpreadsheetCellStores.treeMap(),
-                SpreadsheetExpressionReferenceStores.treeMap(),
-                SpreadsheetColumnStores.treeMap(),
-                SpreadsheetGroupStores.treeMap(),
-                SpreadsheetLabelStores.treeMap(),
-                SpreadsheetExpressionReferenceStores.treeMap(),
-                metadataStore,
-                SpreadsheetCellRangeStores.treeMap(),
-                SpreadsheetCellRangeStores.treeMap(),
-                SpreadsheetRowStores.treeMap(),
-                SpreadsheetUserStores.treeMap()
+            SpreadsheetCellStores.treeMap(),
+            SpreadsheetExpressionReferenceStores.treeMap(),
+            SpreadsheetColumnStores.treeMap(),
+            SpreadsheetGroupStores.treeMap(),
+            SpreadsheetLabelStores.treeMap(),
+            SpreadsheetExpressionReferenceStores.treeMap(),
+            metadataStore,
+            SpreadsheetCellRangeStores.treeMap(),
+            SpreadsheetCellRangeStores.treeMap(),
+            SpreadsheetRowStores.treeMap(),
+            SpreadsheetUserStores.treeMap()
         );
     }
 
@@ -234,10 +234,10 @@ public final class Main implements EntryPoint {
         final MessagePort port = Js.uncheckedCast(worker);
 
         return (processor) -> BrowserHttpServers.messagePort(
-                processor,
-                port,
-                Predicates.always(),
-                targetOrigin(worker.getLocation().getSearch())); // TODO accept parameter.
+            processor,
+            port,
+            Predicates.always(),
+            targetOrigin(worker.getLocation().getSearch())); // TODO accept parameter.
     }
 
     /**
@@ -251,8 +251,8 @@ public final class Main implements EntryPoint {
 
     private static SpreadsheetMetadata spreadsheetMetadataStamper(final SpreadsheetMetadata metadata) {
         return metadata.set(
-                SpreadsheetMetadataPropertyName.MODIFIED_DATE_TIME,
-                LocalDateTime.now()
+            SpreadsheetMetadataPropertyName.MODIFIED_DATE_TIME,
+            LocalDateTime.now()
         );
     }
 }
