@@ -65,6 +65,7 @@ import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
 import walkingkooka.spreadsheet.store.SpreadsheetCellRangeStores;
+import walkingkooka.spreadsheet.store.SpreadsheetCellReferencesStores;
 import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
 import walkingkooka.spreadsheet.store.SpreadsheetColumnStores;
 import walkingkooka.spreadsheet.store.SpreadsheetExpressionReferenceStores;
@@ -207,7 +208,7 @@ public final class Main implements EntryPoint {
     private static Supplier<SpreadsheetStoreRepository> storeRepositorySupplier(final SpreadsheetMetadataStore metadataStore) {
         return () -> SpreadsheetStoreRepositories.basic(
             SpreadsheetCellStores.treeMap(),
-            SpreadsheetExpressionReferenceStores.treeMap(),
+            SpreadsheetCellReferencesStores.treeMap(),
             SpreadsheetColumnStores.treeMap(),
             SpreadsheetGroupStores.treeMap(),
             SpreadsheetLabelStores.treeMap(),
