@@ -252,7 +252,7 @@ public final class Main implements EntryPoint {
 
     private static SpreadsheetMetadata spreadsheetMetadataStamper(final SpreadsheetMetadata metadata) {
         return metadata.set(
-            SpreadsheetMetadataPropertyName.MODIFIED_DATE_TIME,
+            SpreadsheetMetadataPropertyName.MODIFIED_TIMESTAMP,
             LocalDateTime.now()
         );
     }
