@@ -25,6 +25,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.collect.map.Maps;
+import walkingkooka.convert.ConverterContexts;
 import walkingkooka.convert.provider.ConverterProviders;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContexts;
@@ -126,6 +127,7 @@ public final class Main implements EntryPoint {
             MediaTypeDetectors.fake(),
             systemSpreadsheetProvider(),
             ProviderContexts.basic(
+                ConverterContexts.fake(),
                 EnvironmentContexts.empty(
                     now,
                     Optional.of(
