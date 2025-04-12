@@ -255,11 +255,4 @@ public final class Main implements EntryPoint {
         final UrlParameterName parameter = UrlParameterName.with("targetOrigin");
         return urlQueryString.parameter(parameter).orElseThrow(() -> new IllegalArgumentException("Missing query parameter " + CharSequences.quoteAndEscape(parameter.value()) + " from " + queryString));
     }
-
-    private static SpreadsheetMetadata spreadsheetMetadataStamper(final SpreadsheetMetadata metadata) {
-        return metadata.set(
-            SpreadsheetMetadataPropertyName.MODIFIED_TIMESTAMP,
-            LocalDateTime.now()
-        );
-    }
 }
