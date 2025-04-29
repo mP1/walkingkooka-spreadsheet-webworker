@@ -85,6 +85,7 @@ import walkingkooka.tree.expression.function.provider.ExpressionFunctionProvider
 import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallUnmarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeUnmarshallContexts;
+import walkingkooka.validation.form.provider.FormHandlerProviders;
 import walkingkooka.validation.provider.ValidatorProviders;
 
 import java.math.MathContext;
@@ -155,6 +156,7 @@ public final class Main implements EntryPoint {
                 SpreadsheetComparatorProviders.spreadsheetComparators(),
                 SpreadsheetExporterProviders.spreadsheetExport(),
                 SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
+                FormHandlerProviders.validation(),
                 SpreadsheetImporterProviders.spreadsheetImport(),
                 SpreadsheetParserProviders.spreadsheetParsePattern(
                     SpreadsheetFormatterProviders.spreadsheetFormatPattern()
@@ -187,6 +189,7 @@ public final class Main implements EntryPoint {
             SpreadsheetComparatorProviders.spreadsheetComparators(),
             SpreadsheetExporterProviders.spreadsheetExport(),
             spreadsheetFormatterProvider,
+            FormHandlerProviders.validation(),
             SpreadsheetImporterProviders.spreadsheetImport(),
             spreadsheetParserProvider,
             ValidatorProviders.validators()
