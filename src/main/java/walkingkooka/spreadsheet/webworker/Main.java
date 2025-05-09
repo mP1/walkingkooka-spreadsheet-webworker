@@ -45,11 +45,11 @@ import walkingkooka.net.http.server.hateos.HateosResourceHandlerContexts;
 import walkingkooka.plugin.ProviderContexts;
 import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
-import walkingkooka.spreadsheet.SpreadsheetExpressionFunctionNames;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.SpreadsheetConvertersConverterProviders;
 import walkingkooka.spreadsheet.export.SpreadsheetExporterProviders;
+import walkingkooka.spreadsheet.expression.SpreadsheetExpressionFunctions;
 import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressionFunctionProviders;
 import walkingkooka.spreadsheet.format.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.SpreadsheetFormatterProviders;
@@ -151,7 +151,7 @@ public final class Main implements EntryPoint {
             (id) -> SpreadsheetProviders.basic(
                 ConverterProviders.converters(),
                 ExpressionFunctionProviders.empty(
-                    SpreadsheetExpressionFunctionNames.CASE_SENSITIVITY
+                    SpreadsheetExpressionFunctions.NAME_CASE_SENSITIVITY
                 ),
                 SpreadsheetComparatorProviders.spreadsheetComparators(),
                 SpreadsheetExporterProviders.spreadsheetExport(),
