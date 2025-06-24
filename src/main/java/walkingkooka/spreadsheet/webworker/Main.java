@@ -29,6 +29,7 @@ import walkingkooka.convert.ConverterContexts;
 import walkingkooka.convert.provider.ConverterProviders;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContexts;
+import walkingkooka.locale.LocaleContexts;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
@@ -127,6 +128,7 @@ public final class Main implements EntryPoint {
             Indentation.SPACES2,
             LineEnding.SYSTEM,
             MediaTypeDetectors.fake(),
+            LocaleContexts.fake(),
             systemSpreadsheetProvider(),
             ProviderContexts.basic(
                 ConverterContexts.fake(),
@@ -155,11 +157,11 @@ public final class Main implements EntryPoint {
                 ),
                 SpreadsheetComparatorProviders.spreadsheetComparators(),
                 SpreadsheetExporterProviders.spreadsheetExport(),
-                SpreadsheetFormatterProviders.spreadsheetFormatPattern(),
+                SpreadsheetFormatterProviders.spreadsheetFormatters(),
                 FormHandlerProviders.validation(),
                 SpreadsheetImporterProviders.spreadsheetImport(),
                 SpreadsheetParserProviders.spreadsheetParsePattern(
-                    SpreadsheetFormatterProviders.spreadsheetFormatPattern()
+                    SpreadsheetFormatterProviders.spreadsheetFormatters()
                 ),
                 ValidatorProviders.validators()
             ),
@@ -171,7 +173,7 @@ public final class Main implements EntryPoint {
     }
 
     private static SpreadsheetProvider systemSpreadsheetProvider() {
-        final SpreadsheetFormatterProvider spreadsheetFormatterProvider = SpreadsheetFormatterProviders.spreadsheetFormatPattern();
+        final SpreadsheetFormatterProvider spreadsheetFormatterProvider = SpreadsheetFormatterProviders.spreadsheetFormatters();
         final SpreadsheetParserProvider spreadsheetParserProvider = SpreadsheetParserProviders.spreadsheetParsePattern(
             spreadsheetFormatterProvider
         );
