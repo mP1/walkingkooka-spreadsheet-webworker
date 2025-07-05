@@ -15,15 +15,32 @@ jobs:
         with:
           java-version: 11
 
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.6.3
+
       - name: Maven dependency/resolve
         run: mvn dependency:resolve
 
       - name: Maven install
-        run: mvn install -Dmaven.javadoc.skip=true -B -V -e > it-output.txt
+        run: mvn install -Dmaven.javadoc.skip=true -B -V -e > maven-install-output.txt
 
       - name: Print logs
         if: ${{ always() }}
         run: |
-          tail -n 500 target/it-tests/junit-test/build.log
-          tail -n 500 it-output.txt
+          tail -n 500 target/it-tests/gwt-jar-test/build.log
+          tail -n 500 maven-install-output.txt
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: it-tests-gwt-jar-test.log
+          path: target/it-tests/gwt-jar-test/build.log
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: maven-install-output.txt
+          path: maven-install-output.txt
 
