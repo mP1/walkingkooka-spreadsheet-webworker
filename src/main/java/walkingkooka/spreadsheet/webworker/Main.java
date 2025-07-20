@@ -125,8 +125,6 @@ public final class Main implements EntryPoint {
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             Url.parseAbsolute("http://localhost"),
-            Indentation.SPACES2,
-            LineEnding.SYSTEM,
             MediaTypeDetectors.fake(),
             LocaleContexts.fake(),
             systemSpreadsheetProvider(),
@@ -142,6 +140,8 @@ public final class Main implements EntryPoint {
             ),
             metadataStore,
             HateosResourceHandlerContexts.basic(
+                Indentation.SPACES2,
+                LineEnding.SYSTEM,
                 JsonNodeMarshallUnmarshallContexts.basic(
                     JsonNodeMarshallContexts.basic(),
                     JsonNodeUnmarshallContexts.basic(
