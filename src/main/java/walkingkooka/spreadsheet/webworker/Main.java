@@ -43,6 +43,7 @@ import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.net.http.server.hateos.HateosResourceHandlerContexts;
+import walkingkooka.plugin.ProviderContext;
 import walkingkooka.plugin.ProviderContexts;
 import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
@@ -180,12 +181,14 @@ public final class Main implements EntryPoint {
 
         return SpreadsheetProviders.basic(
             SpreadsheetConvertersConverterProviders.spreadsheetConverters(
-                SpreadsheetMetadata.EMPTY.set(
-                    SpreadsheetMetadataPropertyName.LOCALE,
-                    Locale.forLanguageTag("EN-AU")
-                ),
-                spreadsheetFormatterProvider,
-                spreadsheetParserProvider
+                (ProviderContext p) -> SpreadsheetMetadata.EMPTY.set(
+                        SpreadsheetMetadataPropertyName.LOCALE,
+                        Locale.forLanguageTag("EN-AU")
+                    ).generalConverter(
+                        spreadsheetFormatterProvider,
+                        spreadsheetParserProvider,
+                        p
+                    )
             ), // converterProvider
             SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(CaseSensitivity.INSENSITIVE),
             SpreadsheetComparatorProviders.spreadsheetComparators(),
