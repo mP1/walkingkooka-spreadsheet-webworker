@@ -184,7 +184,7 @@ public final class Main implements EntryPoint {
                 (ProviderContext p) -> SpreadsheetMetadata.EMPTY.set(
                         SpreadsheetMetadataPropertyName.LOCALE,
                         Locale.forLanguageTag("EN-AU")
-                    ).generalConverter(
+                    ).dateTimeConverter(
                         spreadsheetFormatterProvider,
                         spreadsheetParserProvider,
                         p
