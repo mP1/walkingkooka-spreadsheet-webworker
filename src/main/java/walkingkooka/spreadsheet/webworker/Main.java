@@ -78,7 +78,7 @@ import walkingkooka.spreadsheet.store.SpreadsheetRowStores;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.spreadsheet.validation.form.store.SpreadsheetFormStores;
-import walkingkooka.storage.StorageStores;
+import walkingkooka.storage.Storages;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
@@ -233,7 +233,7 @@ public final class Main implements EntryPoint {
             SpreadsheetCellRangeStores.treeMap(),
             SpreadsheetCellRangeStores.treeMap(),
             SpreadsheetRowStores.treeMap(),
-            StorageStores.empty(),
+            Storages.empty(),
             SpreadsheetUserStores.treeMap()
         );
     }
