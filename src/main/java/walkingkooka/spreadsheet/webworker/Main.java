@@ -49,7 +49,7 @@ import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.SpreadsheetStrings;
-import walkingkooka.spreadsheet.compare.SpreadsheetComparatorProviders;
+import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.SpreadsheetConvertersConverterProviders;
 import walkingkooka.spreadsheet.export.SpreadsheetExporterProviders;
 import walkingkooka.spreadsheet.expression.SpreadsheetExpressionFunctions;
