@@ -57,6 +57,7 @@ import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressi
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
+import walkingkooka.spreadsheet.meta.SpreadsheetContexts;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
@@ -152,6 +153,7 @@ public final class Main implements EntryPoint {
                     )
                 )
             ),
+            SpreadsheetContexts.fake(),
             (id) -> SpreadsheetProviders.basic(
                 ConverterProviders.converters(),
                 ExpressionFunctionProviders.empty(
