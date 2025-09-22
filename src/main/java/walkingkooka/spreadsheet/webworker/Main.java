@@ -57,7 +57,7 @@ import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressi
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
-import walkingkooka.spreadsheet.meta.SpreadsheetContexts;
+import walkingkooka.spreadsheet.meta.FakeSpreadsheetContext;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
@@ -130,17 +130,6 @@ public final class Main implements EntryPoint {
             MediaTypeDetectors.fake(),
             LocaleContexts.fake(),
             systemSpreadsheetProvider(),
-            ProviderContexts.basic(
-                ConverterContexts.fake(),
-                EnvironmentContexts.empty(
-                    Locale.forLanguageTag("En-AU"),
-                    now,
-                    Optional.of(
-                        EmailAddress.parse("user123@example.com")
-                    )
-                ),
-                PluginStores.treeMap()
-            ),
             metadataStore,
             HateosResourceHandlerContexts.basic(
                 Indentation.SPACES2,
@@ -153,7 +142,22 @@ public final class Main implements EntryPoint {
                     )
                 )
             ),
-            SpreadsheetContexts.fake(),
+            new FakeSpreadsheetContext() {
+                @Override
+                public ProviderContext providerContext() {
+                    return ProviderContexts.basic(
+                        ConverterContexts.fake(),
+                        EnvironmentContexts.empty(
+                            Locale.forLanguageTag("En-AU"),
+                            now,
+                            Optional.of(
+                                EmailAddress.parse("user123@example.com")
+                            )
+                        ),
+                        PluginStores.treeMap()
+                    );
+                }
+            },
             (id) -> SpreadsheetProviders.basic(
                 ConverterProviders.converters(),
                 ExpressionFunctionProviders.empty(
