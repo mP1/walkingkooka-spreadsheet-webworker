@@ -29,7 +29,6 @@ import walkingkooka.convert.ConverterContexts;
 import walkingkooka.convert.provider.ConverterProviders;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContexts;
-import walkingkooka.locale.LocaleContexts;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
@@ -128,7 +127,6 @@ public final class Main implements EntryPoint {
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             Url.parseAbsolute("http://localhost"),
             MediaTypeDetectors.fake(),
-            LocaleContexts.fake(),
             systemSpreadsheetProvider(),
             metadataStore,
             HateosResourceHandlerContexts.basic(
