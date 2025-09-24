@@ -46,6 +46,7 @@ import walkingkooka.plugin.ProviderContext;
 import walkingkooka.plugin.ProviderContexts;
 import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
+import walkingkooka.spreadsheet.FakeSpreadsheetGlobalContext;
 import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.SpreadsheetStrings;
 import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
@@ -56,7 +57,6 @@ import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressi
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
-import walkingkooka.spreadsheet.meta.FakeSpreadsheetContext;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
@@ -134,7 +134,7 @@ public final class Main implements EntryPoint {
                     )
                 )
             ),
-            new FakeSpreadsheetContext() {
+            new FakeSpreadsheetGlobalContext() {
                 @Override
                 public ProviderContext providerContext() {
                     return ProviderContexts.basic(
