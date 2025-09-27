@@ -122,7 +122,6 @@ public final class Main implements EntryPoint {
             Url.parseAbsolute("http://localhost"),
             MediaTypeDetectors.fake(),
             systemSpreadsheetProvider(),
-            metadataStore,
             HateosResourceHandlerContexts.basic(
                 Indentation.SPACES2,
                 LineEnding.SYSTEM,
