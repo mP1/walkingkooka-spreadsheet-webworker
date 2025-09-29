@@ -24,11 +24,10 @@ import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
-import walkingkooka.collect.map.Maps;
 import walkingkooka.convert.ConverterContexts;
-import walkingkooka.convert.provider.ConverterProviders;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContexts;
+import walkingkooka.locale.LocaleContexts;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
@@ -46,18 +45,16 @@ import walkingkooka.plugin.ProviderContext;
 import walkingkooka.plugin.ProviderContexts;
 import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
-import walkingkooka.spreadsheet.FakeSpreadsheetGlobalContext;
-import walkingkooka.spreadsheet.SpreadsheetId;
 import walkingkooka.spreadsheet.SpreadsheetStrings;
 import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.provider.SpreadsheetConvertersConverterProviders;
 import walkingkooka.spreadsheet.export.provider.SpreadsheetExporterProviders;
-import walkingkooka.spreadsheet.expression.SpreadsheetExpressionFunctions;
 import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressionFunctionProviders;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
+import walkingkooka.spreadsheet.meta.SpreadsheetMetadataContexts;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStores;
@@ -68,6 +65,7 @@ import walkingkooka.spreadsheet.provider.SpreadsheetProviders;
 import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
+import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.store.SpreadsheetCellRangeStores;
 import walkingkooka.spreadsheet.store.SpreadsheetCellReferencesStores;
 import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
@@ -76,14 +74,12 @@ import walkingkooka.spreadsheet.store.SpreadsheetLabelReferencesStores;
 import walkingkooka.spreadsheet.store.SpreadsheetLabelStores;
 import walkingkooka.spreadsheet.store.SpreadsheetRowStores;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
-import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.spreadsheet.validation.form.store.SpreadsheetFormStores;
 import walkingkooka.storage.Storages;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
 import walkingkooka.tree.expression.ExpressionNumberKind;
-import walkingkooka.tree.expression.function.provider.ExpressionFunctionProviders;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallUnmarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeUnmarshallContexts;
@@ -93,10 +89,8 @@ import walkingkooka.validation.provider.ValidatorProviders;
 import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Starts the application as a webworker including waiting for messages from the main window.
@@ -116,57 +110,67 @@ public final class Main implements EntryPoint {
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
         final HasNow now = LocalDateTime::now;
+        final Locale locale = Locale.forLanguageTag("en-AU");
+        final EmailAddress user = EmailAddress.parse("user@example.com");
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
-            Url.parseAbsolute("http://localhost"),
             MediaTypeDetectors.fake(),
-            systemSpreadsheetProvider(),
-            HateosResourceHandlerContexts.basic(
-                Indentation.SPACES2,
-                LineEnding.SYSTEM,
-                JsonNodeMarshallUnmarshallContexts.basic(
-                    JsonNodeMarshallContexts.basic(),
-                    JsonNodeUnmarshallContexts.basic(
-                        ExpressionNumberKind.DEFAULT,
-                        MathContext.DECIMAL32
-                    )
-                )
-            ),
-            new FakeSpreadsheetGlobalContext() {
-                @Override
-                public ProviderContext providerContext() {
-                    return ProviderContexts.basic(
-                        ConverterContexts.fake(),
-                        EnvironmentContexts.empty(
-                            Locale.forLanguageTag("En-AU"),
-                            now,
-                            Optional.of(
-                                EmailAddress.parse("user123@example.com")
-                            )
-                        ),
-                        PluginStores.treeMap()
-                    );
-                }
-            },
-            (id) -> SpreadsheetProviders.basic(
-                ConverterProviders.converters(),
-                ExpressionFunctionProviders.empty(
-                    SpreadsheetExpressionFunctions.NAME_CASE_SENSITIVITY
-                ),
-                SpreadsheetComparatorProviders.spreadsheetComparators(),
-                SpreadsheetExporterProviders.spreadsheetExport(),
-                SpreadsheetFormatterProviders.spreadsheetFormatters(),
-                FormHandlerProviders.validation(),
-                SpreadsheetImporterProviders.spreadsheetImport(),
-                SpreadsheetParserProviders.spreadsheetParsePattern(
-                    SpreadsheetFormatterProviders.spreadsheetFormatters()
-                ),
-                ValidatorProviders.validators()
-            ),
-            spreadsheetIdToRepository(Maps.sorted(), storeRepositorySupplier(metadataStore)),
             fileServer(),
-            browserHttpServer(worker)
+            browserHttpServer(worker),
+            SpreadsheetServerContexts.basic(
+                Url.parseAbsolute("http://localhost"),
+                () -> SpreadsheetStoreRepositories.basic(
+                    SpreadsheetCellStores.treeMap(),
+                    SpreadsheetCellReferencesStores.treeMap(),
+                    SpreadsheetColumnStores.treeMap(),
+                    SpreadsheetFormStores.treeMap(),
+                    SpreadsheetGroupStores.treeMap(),
+                    SpreadsheetLabelStores.treeMap(),
+                    SpreadsheetLabelReferencesStores.treeMap(),
+                    metadataStore,
+                    SpreadsheetCellRangeStores.treeMap(),
+                    SpreadsheetCellRangeStores.treeMap(),
+                    SpreadsheetRowStores.treeMap(),
+                    Storages.empty(),
+                    SpreadsheetUserStores.treeMap()
+                ),
+                systemSpreadsheetProvider(),
+                EnvironmentContexts.map(
+                    EnvironmentContexts.empty(
+                        locale,
+                        now,
+                        Optional.of(user)
+                    )
+                ),
+                LocaleContexts.jre(locale),
+                SpreadsheetMetadataContexts.basic(
+                    (u, l) -> SpreadsheetMetadata.EMPTY,
+                    metadataStore
+                ),
+                HateosResourceHandlerContexts.basic(
+                    Indentation.SPACES2,
+                    LineEnding.SYSTEM,
+                    JsonNodeMarshallUnmarshallContexts.basic(
+                        JsonNodeMarshallContexts.basic(),
+                        JsonNodeUnmarshallContexts.basic(
+                            ExpressionNumberKind.DEFAULT,
+                            MathContext.DECIMAL32
+                        )
+                    )
+                ),
+                ProviderContexts.basic(
+                    ConverterContexts.fake(),
+                    EnvironmentContexts.empty(
+                        Locale.forLanguageTag("En-AU"),
+                        now,
+                        Optional.of(
+                            EmailAddress.parse("user123@example.com")
+                        )
+                    ),
+                    PluginStores.treeMap()
+                )
+            )
         );
         server.start();
     }
@@ -180,13 +184,13 @@ public final class Main implements EntryPoint {
         return SpreadsheetProviders.basic(
             SpreadsheetConvertersConverterProviders.spreadsheetConverters(
                 (ProviderContext p) -> SpreadsheetMetadata.EMPTY.set(
-                        SpreadsheetMetadataPropertyName.LOCALE,
-                        Locale.forLanguageTag("EN-AU")
-                    ).dateTimeConverter(
-                        spreadsheetFormatterProvider,
-                        spreadsheetParserProvider,
-                        p
-                    )
+                    SpreadsheetMetadataPropertyName.LOCALE,
+                    Locale.forLanguageTag("EN-AU")
+                ).dateTimeConverter(
+                    spreadsheetFormatterProvider,
+                    spreadsheetParserProvider,
+                    p
+                )
             ), // converterProvider
             SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(SpreadsheetStrings.CASE_SENSITIVITY),
             SpreadsheetComparatorProviders.spreadsheetComparators(),
@@ -196,42 +200,6 @@ public final class Main implements EntryPoint {
             SpreadsheetImporterProviders.spreadsheetImport(),
             spreadsheetParserProvider,
             ValidatorProviders.validators()
-        );
-    }
-
-    /**
-     * Retrieves from the cache or lazily creates a {@link SpreadsheetStoreRepository} for the given {@link SpreadsheetId}.
-     */
-    private static Function<SpreadsheetId, SpreadsheetStoreRepository> spreadsheetIdToRepository(final Map<SpreadsheetId, SpreadsheetStoreRepository> idToRepository,
-                                                                                                 final Supplier<SpreadsheetStoreRepository> repositoryFactory) {
-        return (id) -> {
-            SpreadsheetStoreRepository repository = idToRepository.get(id);
-            if (null == repository) {
-                repository = repositoryFactory.get();
-                idToRepository.put(id, repository); // TODO add locks etc.
-            }
-            return repository;
-        };
-    }
-
-    /**
-     * Creates a new {@link SpreadsheetStoreRepository} on demand
-     */
-    private static Supplier<SpreadsheetStoreRepository> storeRepositorySupplier(final SpreadsheetMetadataStore metadataStore) {
-        return () -> SpreadsheetStoreRepositories.basic(
-            SpreadsheetCellStores.treeMap(),
-            SpreadsheetCellReferencesStores.treeMap(),
-            SpreadsheetColumnStores.treeMap(),
-            SpreadsheetFormStores.treeMap(),
-            SpreadsheetGroupStores.treeMap(),
-            SpreadsheetLabelStores.treeMap(),
-            SpreadsheetLabelReferencesStores.treeMap(),
-            metadataStore,
-            SpreadsheetCellRangeStores.treeMap(),
-            SpreadsheetCellRangeStores.treeMap(),
-            SpreadsheetRowStores.treeMap(),
-            Storages.empty(),
-            SpreadsheetUserStores.treeMap()
         );
     }
 
