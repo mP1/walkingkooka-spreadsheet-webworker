@@ -133,7 +133,6 @@ public final class Main implements EntryPoint {
                     SpreadsheetLabelReferencesStores.treeMap(),
                     metadataStore,
                     SpreadsheetCellRangeStores.treeMap(),
-                    SpreadsheetCellRangeStores.treeMap(),
                     SpreadsheetRowStores.treeMap(),
                     Storages.empty(),
                     SpreadsheetUserStores.treeMap()
