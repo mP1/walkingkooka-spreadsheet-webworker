@@ -68,6 +68,7 @@ import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
 import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
+import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
 import walkingkooka.spreadsheet.store.SpreadsheetCellRangeStores;
 import walkingkooka.spreadsheet.store.SpreadsheetCellReferencesStores;
 import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
@@ -112,6 +113,8 @@ public final class Main implements EntryPoint {
 
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
+        SpreadsheetServerStartup.init();;
+
         final HasNow now = LocalDateTime::now;
         final Locale locale = Locale.forLanguageTag("en-AU");
         final EmailAddress user = EmailAddress.parse("user@example.com");
