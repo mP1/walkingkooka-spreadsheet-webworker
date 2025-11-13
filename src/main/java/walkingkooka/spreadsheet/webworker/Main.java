@@ -127,7 +127,7 @@ public final class Main implements EntryPoint {
             browserHttpServer(worker),
             (u) -> SpreadsheetServerContexts.basic(
                 Url.parseAbsolute("http://localhost"),
-                () -> SpreadsheetStoreRepositories.basic(
+                (id) -> SpreadsheetStoreRepositories.basic(
                     SpreadsheetCellStores.treeMap(),
                     SpreadsheetCellReferencesStores.treeMap(),
                     SpreadsheetColumnStores.treeMap(),
