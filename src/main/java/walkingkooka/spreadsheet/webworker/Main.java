@@ -26,6 +26,7 @@ import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.convert.ConverterContexts;
 import walkingkooka.datetime.HasNow;
+import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
 import walkingkooka.locale.LocaleContexts;
 import walkingkooka.net.Url;
@@ -124,7 +125,7 @@ public final class Main implements EntryPoint {
             MediaTypeDetectors.fake(),
             fileServer(),
             browserHttpServer(worker),
-            SpreadsheetServerContexts.basic(
+            (u) -> SpreadsheetServerContexts.basic(
                 Url.parseAbsolute("http://localhost"),
                 () -> SpreadsheetStoreRepositories.basic(
                     SpreadsheetCellStores.treeMap(),
@@ -155,7 +156,7 @@ public final class Main implements EntryPoint {
                 ),
                 LocaleContexts.jre(locale),
                 SpreadsheetMetadataContexts.basic(
-                    (u, l) -> SpreadsheetMetadata.EMPTY,
+                    (uu, l) -> SpreadsheetMetadata.EMPTY,
                     metadataStore
                 ),
                 HateosResourceHandlerContexts.basic(
@@ -180,7 +181,8 @@ public final class Main implements EntryPoint {
                     ),
                     PluginStores.treeMap()
                 )
-            )
+            ),
+            (r) -> EnvironmentContext.ANONYMOUS
         );
         server.start();
     }
