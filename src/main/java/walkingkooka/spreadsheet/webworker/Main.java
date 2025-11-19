@@ -81,6 +81,7 @@ import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
 import walkingkooka.spreadsheet.validation.form.store.SpreadsheetFormStores;
 import walkingkooka.storage.Storages;
 import walkingkooka.terminal.TerminalContexts;
+import walkingkooka.terminal.server.TerminalServerContexts;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
@@ -180,7 +181,8 @@ public final class Main implements EntryPoint {
                         )
                     ),
                     PluginStores.treeMap()
-                )
+                ),
+                TerminalServerContexts.fake()
             ),
             (r) -> EnvironmentContext.ANONYMOUS
         );
