@@ -65,21 +65,10 @@ import walkingkooka.spreadsheet.parser.provider.SpreadsheetParserProvider;
 import walkingkooka.spreadsheet.parser.provider.SpreadsheetParserProviders;
 import walkingkooka.spreadsheet.provider.SpreadsheetProvider;
 import walkingkooka.spreadsheet.provider.SpreadsheetProviders;
-import walkingkooka.spreadsheet.security.store.SpreadsheetGroupStores;
-import walkingkooka.spreadsheet.security.store.SpreadsheetUserStores;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
-import walkingkooka.spreadsheet.store.SpreadsheetCellRangeStores;
-import walkingkooka.spreadsheet.store.SpreadsheetCellReferencesStores;
-import walkingkooka.spreadsheet.store.SpreadsheetCellStores;
-import walkingkooka.spreadsheet.store.SpreadsheetColumnStores;
-import walkingkooka.spreadsheet.store.SpreadsheetLabelReferencesStores;
-import walkingkooka.spreadsheet.store.SpreadsheetLabelStores;
-import walkingkooka.spreadsheet.store.SpreadsheetRowStores;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
-import walkingkooka.spreadsheet.validation.form.store.SpreadsheetFormStores;
-import walkingkooka.storage.Storages;
 import walkingkooka.terminal.TerminalContexts;
 import walkingkooka.terminal.server.TerminalServerContexts;
 import walkingkooka.text.CharSequences;
@@ -128,20 +117,7 @@ public final class Main implements EntryPoint {
             browserHttpServer(worker),
             (u) -> SpreadsheetServerContexts.basic(
                 Url.parseAbsolute("http://localhost"),
-                (id) -> SpreadsheetStoreRepositories.basic(
-                    SpreadsheetCellStores.treeMap(),
-                    SpreadsheetCellReferencesStores.treeMap(),
-                    SpreadsheetColumnStores.treeMap(),
-                    SpreadsheetFormStores.treeMap(),
-                    SpreadsheetGroupStores.treeMap(),
-                    SpreadsheetLabelStores.treeMap(),
-                    SpreadsheetLabelReferencesStores.treeMap(),
-                    metadataStore,
-                    SpreadsheetCellRangeStores.treeMap(),
-                    SpreadsheetRowStores.treeMap(),
-                    Storages.empty(),
-                    SpreadsheetUserStores.treeMap()
-                ),
+                (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                 systemSpreadsheetProvider(),
                 (c) -> SpreadsheetEngineContexts.basic(
                     SpreadsheetEngineContextMode.FORMULA,
