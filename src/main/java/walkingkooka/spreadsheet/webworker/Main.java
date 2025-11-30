@@ -140,7 +140,7 @@ public final class Main implements EntryPoint {
                 ),
                 HateosResourceHandlerContexts.basic(
                     Indentation.SPACES2,
-                    LineEnding.SYSTEM,
+                    lineEnding,
                     JsonNodeMarshallUnmarshallContexts.basic(
                         JsonNodeMarshallContexts.basic(),
                         JsonNodeUnmarshallContexts.basic(
@@ -153,11 +153,9 @@ public final class Main implements EntryPoint {
                     ConverterContexts.fake(),
                     EnvironmentContexts.empty(
                         lineEnding,
-                        Locale.forLanguageTag("En-AU"),
+                        locale,
                         now,
-                        Optional.of(
-                            EmailAddress.parse("user123@example.com")
-                        )
+                        Optional.of(user)
                     ),
                     PluginStores.treeMap()
                 ),
