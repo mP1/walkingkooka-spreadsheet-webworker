@@ -106,6 +106,7 @@ public final class Main implements EntryPoint {
     static void startServer(final WorkerGlobalScope worker) {
         SpreadsheetServerStartup.init();;
 
+        final LineEnding lineEnding = LineEnding.NL;
         final HasNow now = LocalDateTime::now;
         final Locale locale = Locale.forLanguageTag("en-AU");
         final EmailAddress user = EmailAddress.parse("user@example.com");
@@ -126,6 +127,7 @@ public final class Main implements EntryPoint {
                 ),
                 EnvironmentContexts.map(
                     EnvironmentContexts.empty(
+                        lineEnding,
                         locale,
                         now,
                         Optional.of(user)
@@ -150,6 +152,7 @@ public final class Main implements EntryPoint {
                 ProviderContexts.basic(
                     ConverterContexts.fake(),
                     EnvironmentContexts.empty(
+                        lineEnding,
                         Locale.forLanguageTag("En-AU"),
                         now,
                         Optional.of(
