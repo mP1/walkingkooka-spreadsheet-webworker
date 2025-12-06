@@ -49,8 +49,8 @@ import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetStrings;
 import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.provider.SpreadsheetConvertersConverterProviders;
-import walkingkooka.spreadsheet.engine.SpreadsheetEngineContextMode;
 import walkingkooka.spreadsheet.engine.SpreadsheetEngineContexts;
+import walkingkooka.spreadsheet.engine.SpreadsheetMetadataMode;
 import walkingkooka.spreadsheet.export.provider.SpreadsheetExporterProviders;
 import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressionFunctionProviders;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
@@ -121,7 +121,7 @@ public final class Main implements EntryPoint {
                 (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                 systemSpreadsheetProvider(),
                 (c) -> SpreadsheetEngineContexts.basic(
-                    SpreadsheetEngineContextMode.FORMULA,
+                    SpreadsheetMetadataMode.FORMULA,
                     c,
                     TerminalContexts.fake()
                 ),
