@@ -51,6 +51,8 @@ import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.provider.SpreadsheetConvertersConverterProviders;
 import walkingkooka.spreadsheet.engine.SpreadsheetEngineContexts;
 import walkingkooka.spreadsheet.engine.SpreadsheetMetadataMode;
+import walkingkooka.spreadsheet.environment.SpreadsheetEnvironmentContext;
+import walkingkooka.spreadsheet.environment.SpreadsheetEnvironmentContexts;
 import walkingkooka.spreadsheet.export.provider.SpreadsheetExporterProviders;
 import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressionFunctionProviders;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
@@ -117,7 +119,6 @@ public final class Main implements EntryPoint {
             fileServer(),
             browserHttpServer(worker),
             (u) -> SpreadsheetServerContexts.basic(
-                Url.parseAbsolute("http://localhost"),
                 (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                 systemSpreadsheetProvider(),
                 (c) -> SpreadsheetEngineContexts.basic(
@@ -125,12 +126,17 @@ public final class Main implements EntryPoint {
                     c,
                     TerminalContexts.fake()
                 ),
-                EnvironmentContexts.map(
-                    EnvironmentContexts.empty(
-                        lineEnding,
-                        locale,
-                        now,
-                        Optional.of(user)
+                SpreadsheetEnvironmentContexts.basic(
+                    EnvironmentContexts.map(
+                        EnvironmentContexts.empty(
+                            lineEnding,
+                            locale,
+                            now,
+                            Optional.of(user)
+                        )
+                    ).setEnvironmentValue(
+                        SpreadsheetEnvironmentContext.SERVER_URL,
+                        Url.parseAbsolute("https://example.com")
                     )
                 ),
                 LocaleContexts.jre(locale),
