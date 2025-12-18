@@ -121,7 +121,7 @@ public final class Main implements EntryPoint {
             (u) -> SpreadsheetServerContexts.basic(
                 (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                 systemSpreadsheetProvider(),
-                (c) -> SpreadsheetEngineContexts.basic(
+                (c) -> SpreadsheetEngineContexts.spreadsheetContext(
                     SpreadsheetMetadataMode.FORMULA,
                     c,
                     TerminalContexts.fake()
