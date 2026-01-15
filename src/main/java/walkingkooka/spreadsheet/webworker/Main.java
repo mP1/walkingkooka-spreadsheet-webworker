@@ -107,7 +107,8 @@ public final class Main implements EntryPoint {
 
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
-        SpreadsheetServerStartup.init();;
+        SpreadsheetServerStartup.init();
+        ;
 
         final LineEnding lineEnding = LineEnding.NL;
         final HasNow now = LocalDateTime::now;
@@ -119,58 +120,60 @@ public final class Main implements EntryPoint {
             MediaTypeDetectors.fake(),
             fileServer(),
             browserHttpServer(worker),
-            (u) -> SpreadsheetServerContexts.basic(
-                (id) -> SpreadsheetStoreRepositories.treeMap(
-                    metadataStore,
-                    Storages.fake()
-                ),
-                systemSpreadsheetProvider(),
-                (c) -> SpreadsheetEngineContexts.spreadsheetContext(
-                    SpreadsheetMetadataMode.FORMULA,
-                    c,
-                    TerminalContexts.fake()
-                ),
-                SpreadsheetEnvironmentContexts.basic(
-                    EnvironmentContexts.map(
-                        EnvironmentContexts.empty(
-                            lineEnding,
-                            locale,
-                            now,
-                            Optional.of(user)
-                        )
-                    ).setEnvironmentValue(
-                        SpreadsheetEnvironmentContext.SERVER_URL,
-                        Url.parseAbsolute("https://example.com")
-                    )
-                ),
-                LocaleContexts.jre(locale),
-                SpreadsheetMetadataContexts.basic(
-                    (uu, l) -> SpreadsheetMetadata.EMPTY,
-                    metadataStore
-                ),
-                HateosResourceHandlerContexts.basic(
-                    Indentation.SPACES2,
-                    lineEnding,
-                    JsonNodeMarshallUnmarshallContexts.basic(
-                        JsonNodeMarshallContexts.basic(),
-                        JsonNodeUnmarshallContexts.basic(
-                            ExpressionNumberKind.DEFAULT,
-                            MathContext.DECIMAL32
-                        )
-                    )
-                ),
-                ProviderContexts.basic(
-                    ConverterContexts.fake(),
+            (u) -> {
+                final EnvironmentContext environmentContext = EnvironmentContexts.map(
                     EnvironmentContexts.empty(
                         lineEnding,
                         locale,
                         now,
                         Optional.of(user)
+                    )
+                );
+                environmentContext.setEnvironmentValue(
+                    SpreadsheetEnvironmentContext.SERVER_URL,
+                    Url.parseAbsolute("https://example.com")
+                );
+                return SpreadsheetServerContexts.basic(
+                    (id) -> SpreadsheetStoreRepositories.treeMap(
+                        metadataStore,
+                        Storages.fake()
                     ),
-                    PluginStores.treeMap()
-                ),
-                TerminalServerContexts.fake()
-            ),
+                    systemSpreadsheetProvider(),
+                    (c) -> SpreadsheetEngineContexts.spreadsheetContext(
+                        SpreadsheetMetadataMode.FORMULA,
+                        c,
+                        TerminalContexts.fake()
+                    ),
+                    SpreadsheetEnvironmentContexts.basic(environmentContext),
+                    LocaleContexts.jre(locale),
+                    SpreadsheetMetadataContexts.basic(
+                        (uu, l) -> SpreadsheetMetadata.EMPTY,
+                        metadataStore
+                    ),
+                    HateosResourceHandlerContexts.basic(
+                        Indentation.SPACES2,
+                        lineEnding,
+                        JsonNodeMarshallUnmarshallContexts.basic(
+                            JsonNodeMarshallContexts.basic(),
+                            JsonNodeUnmarshallContexts.basic(
+                                ExpressionNumberKind.DEFAULT,
+                                MathContext.DECIMAL32
+                            )
+                        )
+                    ),
+                    ProviderContexts.basic(
+                        ConverterContexts.fake(),
+                        EnvironmentContexts.empty(
+                            lineEnding,
+                            locale,
+                            now,
+                            Optional.of(user)
+                        ),
+                        PluginStores.treeMap()
+                    ),
+                    TerminalServerContexts.fake()
+                );
+            },
             (r) -> EnvironmentContext.ANONYMOUS
         );
         server.start();
