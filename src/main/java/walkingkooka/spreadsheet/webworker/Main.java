@@ -134,17 +134,17 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
-                    (id) -> SpreadsheetStoreRepositories.treeMap(
-                        metadataStore,
-                        Storages.fake()
-                    ),
+                    (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                     systemSpreadsheetProvider(),
                     (c) -> SpreadsheetEngineContexts.spreadsheetContext(
                         SpreadsheetMetadataMode.FORMULA,
                         c,
                         TerminalContexts.fake()
                     ),
-                    SpreadsheetEnvironmentContexts.basic(environmentContext),
+                    SpreadsheetEnvironmentContexts.basic(
+                        Storages.tree(),
+                        environmentContext
+                    ),
                     LocaleContexts.jre(locale),
                     SpreadsheetMetadataContexts.basic(
                         (uu, l) -> SpreadsheetMetadata.EMPTY,
