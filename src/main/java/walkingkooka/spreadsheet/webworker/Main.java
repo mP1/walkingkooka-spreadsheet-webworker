@@ -50,6 +50,7 @@ import walkingkooka.spreadsheet.SpreadsheetStrings;
 import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.provider.SpreadsheetConvertersConverterProviders;
 import walkingkooka.spreadsheet.engine.SpreadsheetEngineContexts;
+import walkingkooka.spreadsheet.engine.SpreadsheetEngines;
 import walkingkooka.spreadsheet.engine.SpreadsheetMetadataMode;
 import walkingkooka.spreadsheet.environment.SpreadsheetEnvironmentContext;
 import walkingkooka.spreadsheet.environment.SpreadsheetEnvironmentContexts;
@@ -134,6 +135,7 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
+                    SpreadsheetEngines.basic(),
                     (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                     systemSpreadsheetProvider(),
                     (c) -> SpreadsheetEngineContexts.spreadsheetContext(
