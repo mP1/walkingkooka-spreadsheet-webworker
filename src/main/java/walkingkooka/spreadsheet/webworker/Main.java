@@ -109,8 +109,8 @@ public final class Main implements EntryPoint {
     // VisibleForTesting
     static void startServer(final WorkerGlobalScope worker) {
         SpreadsheetServerStartup.init();
-        ;
 
+        final Indentation indentation = Indentation.SPACES2;
         final LineEnding lineEnding = LineEnding.NL;
         final HasNow now = LocalDateTime::now;
         final Locale locale = Locale.forLanguageTag("en-AU");
@@ -124,6 +124,7 @@ public final class Main implements EntryPoint {
             (u) -> {
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
                     EnvironmentContexts.empty(
+                        indentation,
                         lineEnding,
                         locale,
                         now,
@@ -166,6 +167,7 @@ public final class Main implements EntryPoint {
                     ProviderContexts.basic(
                         ConverterContexts.fake(),
                         EnvironmentContexts.empty(
+                            indentation,
                             lineEnding,
                             locale,
                             now,
