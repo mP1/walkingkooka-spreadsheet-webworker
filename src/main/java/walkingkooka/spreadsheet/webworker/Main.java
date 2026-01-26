@@ -46,7 +46,6 @@ import walkingkooka.plugin.ProviderContext;
 import walkingkooka.plugin.ProviderContexts;
 import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
-import walkingkooka.spreadsheet.FakeSpreadsheetContext;
 import walkingkooka.spreadsheet.SpreadsheetStrings;
 import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
 import walkingkooka.spreadsheet.convert.provider.SpreadsheetConvertersConverterProviders;
@@ -60,7 +59,6 @@ import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressi
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
-import walkingkooka.spreadsheet.meta.SpreadsheetId;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataContexts;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
@@ -74,7 +72,6 @@ import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
-import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepository;
 import walkingkooka.storage.Storages;
 import walkingkooka.terminal.TerminalContexts;
 import walkingkooka.terminal.server.TerminalServerContexts;
@@ -140,18 +137,7 @@ public final class Main implements EntryPoint {
                 );
                 return SpreadsheetServerContexts.basic(
                     SpreadsheetEngines.basic(),
-                    // https://github.com/mP1/walkingkooka-spreadsheet-server/issues/2211
-                    // BasicSpreadsheetServerContext: replace SpreadsheetContextSupplier w/ Function<SpreadsheetId, SpreadsheetStoreRepository>
-                    (SpreadsheetId id) -> Optional.of(
-                        new FakeSpreadsheetContext() {
-                            @Override
-                            public SpreadsheetStoreRepository storeRepository() {
-                                return this.repo;
-                            }
-
-                            private final SpreadsheetStoreRepository repo = SpreadsheetStoreRepositories.treeMap(metadataStore);
-                        }
-                    ),
+                    (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
                     systemSpreadsheetProvider(),
                     (c) -> SpreadsheetEngineContexts.spreadsheetContext(
                         SpreadsheetMetadataMode.FORMULA,
