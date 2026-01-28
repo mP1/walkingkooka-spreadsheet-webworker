@@ -134,7 +134,9 @@ public final class Main implements EntryPoint {
                 );
                 return SpreadsheetServerContexts.basic(
                     SpreadsheetEngines.basic(),
-                    (id) -> SpreadsheetStoreRepositories.treeMap(metadataStore),
+                    (id) -> Optional.of(
+                        SpreadsheetStoreRepositories.treeMap(metadataStore)
+                    ),
                     systemSpreadsheetProvider(),
                     SpreadsheetEnvironmentContexts.basic(
                         Storages.tree(),
