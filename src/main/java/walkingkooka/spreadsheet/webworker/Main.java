@@ -84,6 +84,7 @@ import walkingkooka.validation.provider.ValidatorProviders;
 
 import java.math.MathContext;
 import java.time.LocalDateTime;
+import java.util.Currency;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
@@ -107,10 +108,12 @@ public final class Main implements EntryPoint {
     static void startServer(final WorkerGlobalScope worker) {
         SpreadsheetServerStartup.init();
 
+        final Locale locale = Locale.forLanguageTag("en-AU");
+
+        final Currency currency = Currency.getInstance(locale);
         final Indentation indentation = Indentation.SPACES2;
         final LineEnding lineEnding = LineEnding.NL;
         final HasNow now = LocalDateTime::now;
-        final Locale locale = Locale.forLanguageTag("en-AU");
         final EmailAddress user = EmailAddress.parse("user@example.com");
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
 
@@ -121,6 +124,7 @@ public final class Main implements EntryPoint {
             (u) -> {
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
                     EnvironmentContexts.empty(
+                        currency,
                         indentation,
                         lineEnding,
                         locale,
@@ -161,6 +165,7 @@ public final class Main implements EntryPoint {
                     ProviderContexts.basic(
                         ConverterContexts.fake(),
                         EnvironmentContexts.empty(
+                            currency,
                             indentation,
                             lineEnding,
                             locale,
