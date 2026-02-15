@@ -144,7 +144,7 @@ public final class Main implements EntryPoint {
                     ),
                     systemSpreadsheetProvider(),
                     CurrencyContexts.readOnly(
-                        CurrencyContexts.jdk(
+                        CurrencyContexts.jre(
                             Currency.getInstance(locale),
                             (f, t) -> 1.0 * f.getDisplayName().length() / t.getDisplayName().length()
                         )
