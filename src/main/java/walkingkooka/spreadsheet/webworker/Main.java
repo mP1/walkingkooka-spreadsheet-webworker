@@ -25,6 +25,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.convert.ConverterContexts;
+import walkingkooka.currency.CurrencyContexts;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
@@ -142,6 +143,12 @@ public final class Main implements EntryPoint {
                         SpreadsheetStoreRepositories.treeMap(metadataStore)
                     ),
                     systemSpreadsheetProvider(),
+                    CurrencyContexts.readOnly(
+                        CurrencyContexts.jdk(
+                            Currency.getInstance(locale),
+                            (f, t) -> 1.0 * f.getDisplayName().length() / t.getDisplayName().length()
+                        )
+                    ),
                     SpreadsheetEnvironmentContexts.basic(
                         Storages.tree(),
                         environmentContext
@@ -157,6 +164,9 @@ public final class Main implements EntryPoint {
                         JsonNodeMarshallUnmarshallContexts.basic(
                             JsonNodeMarshallContexts.basic(),
                             JsonNodeUnmarshallContexts.basic(
+                                (String cc) -> Optional.of(
+                                    Currency.getInstance(cc)
+                                ),
                                 ExpressionNumberKind.DEFAULT,
                                 MathContext.DECIMAL32
                             )
