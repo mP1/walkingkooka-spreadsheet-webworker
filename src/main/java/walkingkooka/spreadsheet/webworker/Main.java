@@ -168,6 +168,9 @@ public final class Main implements EntryPoint {
                                 (String cc) -> Optional.of(
                                     Currency.getInstance(cc)
                                 ),
+                                (String lt) -> Optional.of(
+                                    Locale.forLanguageTag(lt)
+                                ),
                                 ExpressionNumberKind.DEFAULT,
                                 MathContext.DECIMAL32
                             )
