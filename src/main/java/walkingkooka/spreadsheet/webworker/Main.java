@@ -149,12 +149,13 @@ public final class Main implements EntryPoint {
                             (f, t) -> 1.0 * f.getDisplayName().length() / t.getDisplayName().length(),
                             () -> locale
                         )
+                    ).setLocaleContext(
+                        LocaleContexts.jre(locale)
                     ),
                     SpreadsheetEnvironmentContexts.basic(
                         Storages.tree(),
                         environmentContext
                     ),
-                    LocaleContexts.jre(locale),
                     SpreadsheetMetadataContexts.basic(
                         (uu, l) -> SpreadsheetMetadata.EMPTY,
                         metadataStore
