@@ -153,7 +153,7 @@ public final class Main implements EntryPoint {
                         LocaleContexts.jre(locale)
                     ),
                     SpreadsheetEnvironmentContexts.basic(
-                        Storages.tree(),
+                        Storages.treeMapStore(),
                         environmentContext
                     ),
                     SpreadsheetMetadataContexts.basic(
