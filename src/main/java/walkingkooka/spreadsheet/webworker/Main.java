@@ -25,10 +25,12 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.convert.ConverterContexts;
+import walkingkooka.currency.CurrencyContext;
 import walkingkooka.currency.CurrencyContexts;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
+import walkingkooka.locale.LocaleContext;
 import walkingkooka.locale.LocaleContexts;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
@@ -118,6 +120,15 @@ public final class Main implements EntryPoint {
         final EmailAddress user = EmailAddress.parse("user@example.com");
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
 
+        final LocaleContext localeContext = LocaleContexts.jre(locale);
+        final CurrencyContext currencyContext = CurrencyContexts.readOnly(
+            CurrencyContexts.jre(
+                Currency.getInstance(locale),
+                (f, t) -> 1.0 * f.getDisplayName().length() / t.getDisplayName().length(),
+                localeContext
+            )
+        );
+
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             MediaTypeDetectors.fake(),
             fileServer(),
@@ -143,15 +154,7 @@ public final class Main implements EntryPoint {
                         SpreadsheetStoreRepositories.treeMap(metadataStore)
                     ),
                     systemSpreadsheetProvider(),
-                    CurrencyContexts.readOnly(
-                        CurrencyContexts.jre(
-                            Currency.getInstance(locale),
-                            (f, t) -> 1.0 * f.getDisplayName().length() / t.getDisplayName().length(),
-                            () -> locale
-                        )
-                    ).setLocaleContext(
-                        LocaleContexts.jre(locale)
-                    ),
+                    currencyContext.setLocaleContext(localeContext),
                     SpreadsheetEnvironmentContexts.basic(
                         Storages.treeMapStore(),
                         environmentContext
