@@ -169,13 +169,8 @@ public final class Main implements EntryPoint {
                         JsonNodeMarshallUnmarshallContexts.basic(
                             JsonNodeMarshallContexts.basic(),
                             JsonNodeUnmarshallContexts.basic(
-                                (String cc) -> Optional.of(
-                                    Currency.getInstance(cc)
-                                ),
-                                (String lt) -> Optional.of(
-                                    Locale.forLanguageTag(lt)
-                                ),
                                 ExpressionNumberKind.DEFAULT,
+                                currencyContext.setLocaleContext(localeContext), // CurrencyCodeLanguageTagContext
                                 MathContext.DECIMAL32
                             )
                         )
