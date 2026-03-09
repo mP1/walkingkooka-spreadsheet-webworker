@@ -124,7 +124,10 @@ public final class Main implements EntryPoint {
         final CurrencyContext currencyContext = CurrencyContexts.readOnly(
             CurrencyContexts.jre(
                 Currency.getInstance(locale),
-                (f, t) -> 1.0 * f.getDisplayName().length() / t.getDisplayName().length(),
+                (final Currency from,
+                 final Currency to,
+                 final Optional<LocalDateTime> dateTime) ->
+                    1.0 * from.getDisplayName().length() / to.getDisplayName().length(),
                 localeContext
             )
         );
