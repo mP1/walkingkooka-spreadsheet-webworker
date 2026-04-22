@@ -25,6 +25,7 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.convert.ConverterContexts;
+import walkingkooka.currency.CurrencyCode;
 import walkingkooka.currency.CurrencyContext;
 import walkingkooka.currency.CurrencyContexts;
 import walkingkooka.datetime.HasNow;
@@ -124,10 +125,16 @@ public final class Main implements EntryPoint {
         final CurrencyContext currencyContext = CurrencyContexts.readOnly(
             CurrencyContexts.jre(
                 Currency.getInstance(locale),
-                (final Currency from,
-                 final Currency to,
+                (final CurrencyCode from,
+                 final CurrencyCode to,
                  final Optional<LocalDateTime> dateTime) ->
-                    1.0 * from.getDisplayName().length() / to.getDisplayName().length(),
+                    1.0 *
+                        Currency.getInstance(
+                            from.value()
+                        ).getDisplayName().length() /
+                        Currency.getInstance(
+                            to.value()
+                        ).getDisplayName().length(),
                 localeContext
             )
         );
