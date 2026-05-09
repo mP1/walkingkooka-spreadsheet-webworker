@@ -128,13 +128,15 @@ public final class Main implements EntryPoint {
                 (final CurrencyCode from,
                  final CurrencyCode to,
                  final Optional<LocalDateTime> dateTime) ->
-                    1.0 *
-                        Currency.getInstance(
-                            from.value()
-                        ).getDisplayName().length() /
-                        Currency.getInstance(
-                            to.value()
-                        ).getDisplayName().length(),
+                    Optional.of(
+                        1.0 *
+                            Currency.getInstance(
+                                from.value()
+                            ).getDisplayName().length() /
+                            Currency.getInstance(
+                                to.value()
+                            ).getDisplayName().length()
+                    ),
                 localeContext
             )
         );
