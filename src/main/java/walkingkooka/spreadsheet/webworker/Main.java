@@ -25,9 +25,11 @@ import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
 import walkingkooka.convert.ConverterContexts;
+import walkingkooka.currency.CurrencyCode;
 import walkingkooka.currency.CurrencyContext;
 import walkingkooka.currency.CurrencyContexts;
 import walkingkooka.currency.CurrencyExchange;
+import walkingkooka.currency.CurrencyExchangeRater;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
@@ -91,6 +93,7 @@ import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -125,19 +128,35 @@ public final class Main implements EntryPoint {
         final CurrencyContext currencyContext = CurrencyContexts.readOnly(
             CurrencyContexts.jre(
                 Currency.getInstance(locale),
-                (final CurrencyExchange currencyExchange,
-                 final Optional<LocalDateTime> dateTime) ->
-                    Optional.of(
-                        1.0 *
-                            Currency.getInstance(
-                                currencyExchange.from()
-                                    .value()
-                            ).getDisplayName().length() /
-                            Currency.getInstance(
-                                currencyExchange.to()
-                                    .value()
-                            ).getDisplayName().length()
-                    ),
+                new CurrencyExchangeRater() {
+                    @Override
+                    public Set<CurrencyExchange> currencyExchanges() {
+                        return Set.of(
+                            CurrencyExchange.with(
+                                CurrencyCode.parse("AUD"),
+                                CurrencyCode.parse("NZD")
+                            )
+                        );
+                    }
+
+                    @Override
+                    public Optional<Number> exchangeRate(final CurrencyExchange currencyExchange,
+                                                         final Optional<LocalDateTime> dateTime) {
+                        return Optional.of(
+                            1.0f *
+                                Currency.getInstance(
+                                        currencyExchange.from()
+                                            .value()
+                                    ).getDisplayName()
+                                    .length() /
+                                Currency.getInstance(
+                                        currencyExchange.to()
+                                            .value()
+                                    ).getDisplayName()
+                                    .length()
+                        );
+                    }
+                },
                 localeContext
             )
         );
