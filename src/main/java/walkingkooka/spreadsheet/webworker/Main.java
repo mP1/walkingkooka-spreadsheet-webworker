@@ -82,6 +82,7 @@ import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
 import walkingkooka.tree.expression.ExpressionNumberKind;
+import walkingkooka.tree.expression.convert.ExpressionNumberBinaryNumberConverterFunctions;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallUnmarshallContexts;
 import walkingkooka.tree.json.marshall.JsonNodeUnmarshallContexts;
@@ -181,6 +182,7 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
+                    ExpressionNumberBinaryNumberConverterFunctions.multiply(),
                     SpreadsheetEngines.basic(),
                     (id) -> Optional.of(
                         SpreadsheetStoreRepositories.treeMap(metadataStore)
