@@ -24,6 +24,7 @@ import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Either;
+import walkingkooka.collect.set.Sets;
 import walkingkooka.convert.ConverterContexts;
 import walkingkooka.currency.CurrencyCode;
 import walkingkooka.currency.CurrencyContext;
@@ -132,7 +133,7 @@ public final class Main implements EntryPoint {
                 new CurrencyExchangeRater() {
                     @Override
                     public Set<CurrencyExchange> currencyExchanges() {
-                        return Set.of(
+                        return Sets.of(
                             CurrencyExchange.with(
                                 CurrencyCode.parse("AUD"),
                                 CurrencyCode.parse("NZD")
@@ -141,21 +142,9 @@ public final class Main implements EntryPoint {
                     }
 
                     @Override
-                    public Optional<Number> exchangeRate(final CurrencyExchange currencyExchange,
-                                                         final Optional<LocalDateTime> dateTime) {
-                        return Optional.of(
-                            1.0f *
-                                Currency.getInstance(
-                                        currencyExchange.from()
-                                            .value()
-                                    ).getDisplayName()
-                                    .length() /
-                                Currency.getInstance(
-                                        currencyExchange.to()
-                                            .value()
-                                    ).getDisplayName()
-                                    .length()
-                        );
+                    public Optional<Number> currencyExchangeRate(final CurrencyExchange currencyExchange,
+                                                                 final Optional<LocalDateTime> dateTime) {
+                        return Optional.empty();
                     }
                 },
                 localeContext
