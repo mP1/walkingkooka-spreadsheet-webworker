@@ -91,6 +91,7 @@ import walkingkooka.validation.form.provider.FormHandlerProviders;
 import walkingkooka.validation.provider.ValidatorProviders;
 
 import java.math.MathContext;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.Locale;
@@ -171,6 +172,7 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
+                    StandardCharsets.UTF_8,
                     ExpressionNumberBinaryNumberConverterFunctions.multiply(),
                     SpreadsheetEngines.basic(),
                     (id) -> Optional.of(
