@@ -91,6 +91,7 @@ import walkingkooka.validation.form.provider.FormHandlerProviders;
 import walkingkooka.validation.provider.ValidatorProviders;
 
 import java.math.MathContext;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Currency;
@@ -120,6 +121,7 @@ public final class Main implements EntryPoint {
 
         final Locale locale = Locale.forLanguageTag("en-AU");
 
+        final Charset charset = StandardCharsets.UTF_8;
         final Currency currency = Currency.getInstance(locale);
         final Indentation indentation = Indentation.SPACES2;
         final LineEnding lineEnding = LineEnding.NL;
@@ -159,6 +161,7 @@ public final class Main implements EntryPoint {
             (u) -> {
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
                     EnvironmentContexts.empty(
+                        charset,
                         currency,
                         indentation,
                         lineEnding,
@@ -172,7 +175,6 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
-                    StandardCharsets.UTF_8,
                     ExpressionNumberBinaryNumberConverterFunctions.multiply(),
                     SpreadsheetEngines.basic(),
                     (id) -> Optional.of(
@@ -203,6 +205,7 @@ public final class Main implements EntryPoint {
                     ProviderContexts.basic(
                         ConverterContexts.fake(),
                         EnvironmentContexts.empty(
+                            charset,
                             currency,
                             indentation,
                             lineEnding,
