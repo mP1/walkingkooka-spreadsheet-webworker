@@ -175,6 +175,7 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
+                    MediaTypeDetectors.binary(),
                     ExpressionNumberBinaryNumberConverterFunctions.multiply(),
                     SpreadsheetEngines.basic(),
                     (id) -> Optional.of(
