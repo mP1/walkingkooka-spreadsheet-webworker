@@ -64,6 +64,7 @@ import walkingkooka.spreadsheet.expression.function.provider.SpreadsheetExpressi
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
+import walkingkooka.spreadsheet.meta.FakeSpreadsheetMetadataCreator;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataContexts;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
@@ -176,6 +177,7 @@ public final class Main implements EntryPoint {
                 );
                 return SpreadsheetServerContexts.basic(
                     MediaTypeDetectors.binary(),
+                    new FakeSpreadsheetMetadataCreator(),
                     ExpressionNumberBinaryNumberConverterFunctions.multiply(),
                     SpreadsheetEngines.basic(),
                     (id) -> Optional.of(
