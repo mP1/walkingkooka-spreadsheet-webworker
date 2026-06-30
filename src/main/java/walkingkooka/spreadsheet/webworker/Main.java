@@ -23,6 +23,7 @@ import elemental2.dom.WorkerGlobalScope;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
+import walkingkooka.Cast;
 import walkingkooka.Either;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.convert.ConverterContexts;
@@ -44,7 +45,9 @@ import walkingkooka.net.email.EmailAddress;
 import walkingkooka.net.header.MediaTypeDetectors;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
+import walkingkooka.net.http.server.FakeHttpHandlerContext;
 import walkingkooka.net.http.server.HttpHandler;
+import walkingkooka.net.http.server.HttpHandlerContext;
 import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
@@ -262,14 +265,17 @@ public final class Main implements EntryPoint {
     /**
      * Creates a {@link BrowserHttpServers}.
      */
-    private static Function<HttpHandler, HttpServer> browserHttpServer(final WorkerGlobalScope worker) {
+    private static Function<HttpHandler<HttpHandlerContext>, HttpServer> browserHttpServer(final WorkerGlobalScope worker) {
         final MessagePort port = Js.uncheckedCast(worker);
 
-        return (processor) -> BrowserHttpServers.messagePort(
-            processor,
-            port,
-            Predicates.always(),
-            targetOrigin(worker.getLocation().getSearch())); // TODO accept parameter.
+        return (processor) -> Cast.to(
+            BrowserHttpServers.messagePort(
+                processor,
+                new FakeHttpHandlerContext(),
+                port,
+                Predicates.always(),
+                targetOrigin(worker.getLocation().getSearch()))
+        ); // TODO accept parameter.
     }
 
     /**
