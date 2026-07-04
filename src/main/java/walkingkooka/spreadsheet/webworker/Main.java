@@ -158,7 +158,6 @@ public final class Main implements EntryPoint {
         );
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
-            MediaTypeDetectors.fake(),
             fileServer(),
             browserHttpServer(worker),
             (u) -> {
