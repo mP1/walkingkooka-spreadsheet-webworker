@@ -51,7 +51,7 @@ import walkingkooka.net.http.server.HttpHandlerContext;
 import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
-import walkingkooka.net.http.server.hateos.HateosResourceHandlerContexts;
+import walkingkooka.net.http.server.hateos.HateosHandlerContexts;
 import walkingkooka.plugin.ProviderContext;
 import walkingkooka.plugin.ProviderContexts;
 import walkingkooka.plugin.store.PluginStores;
@@ -194,7 +194,7 @@ public final class Main implements EntryPoint {
                         (uu, l) -> SpreadsheetMetadata.EMPTY,
                         metadataStore
                     ),
-                    HateosResourceHandlerContexts.basic(
+                    HateosHandlerContexts.basic(
                         Indentation.SPACES2,
                         lineEnding,
                         JsonNodeMarshallUnmarshallContexts.basic(
