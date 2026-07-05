@@ -45,9 +45,7 @@ import walkingkooka.net.email.EmailAddress;
 import walkingkooka.net.header.MediaTypeDetectors;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
-import walkingkooka.net.http.server.FakeHttpHandlerContext;
 import walkingkooka.net.http.server.HttpHandler;
-import walkingkooka.net.http.server.HttpHandlerContext;
 import walkingkooka.net.http.server.HttpServer;
 import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
@@ -76,7 +74,9 @@ import walkingkooka.spreadsheet.parser.provider.SpreadsheetParserProvider;
 import walkingkooka.spreadsheet.parser.provider.SpreadsheetParserProviders;
 import walkingkooka.spreadsheet.provider.SpreadsheetProvider;
 import walkingkooka.spreadsheet.provider.SpreadsheetProviders;
+import walkingkooka.spreadsheet.server.FakeSpreadsheetServerContext;
 import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
+import walkingkooka.spreadsheet.server.SpreadsheetServerContext;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
@@ -264,13 +264,13 @@ public final class Main implements EntryPoint {
     /**
      * Creates a {@link BrowserHttpServers}.
      */
-    private static Function<HttpHandler<HttpHandlerContext>, HttpServer> browserHttpServer(final WorkerGlobalScope worker) {
+    private static Function<HttpHandler<SpreadsheetServerContext>, HttpServer> browserHttpServer(final WorkerGlobalScope worker) {
         final MessagePort port = Js.uncheckedCast(worker);
 
         return (processor) -> Cast.to(
             BrowserHttpServers.messagePort(
                 processor,
-                new FakeHttpHandlerContext(),
+                new FakeSpreadsheetServerContext(),
                 port,
                 Predicates.always(),
                 targetOrigin(worker.getLocation().getSearch()))
