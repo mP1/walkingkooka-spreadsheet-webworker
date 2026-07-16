@@ -85,6 +85,7 @@ import walkingkooka.terminal.server.TerminalServerContexts;
 import walkingkooka.text.CharSequences;
 import walkingkooka.text.Indentation;
 import walkingkooka.text.LineEnding;
+import walkingkooka.text.TextPrinting;
 import walkingkooka.tree.expression.ExpressionNumberKind;
 import walkingkooka.tree.expression.convert.ExpressionNumberBinaryNumberConverterFunctions;
 import walkingkooka.tree.json.marshall.JsonNodeMarshallContexts;
@@ -194,8 +195,6 @@ public final class Main implements EntryPoint {
                         metadataStore
                     ),
                     HateosHandlerContexts.basic(
-                        Indentation.SPACES2,
-                        lineEnding,
                         JsonNodeMarshallUnmarshallContexts.basic(
                             JsonNodeMarshallContexts.basic(),
                             JsonNodeUnmarshallContexts.basic(
@@ -203,6 +202,10 @@ public final class Main implements EntryPoint {
                                 currencyContext.setLocaleContext(localeContext), // CurrencyCodeLanguageTagContext
                                 MathContext.DECIMAL32
                             )
+                        ),
+                        TextPrinting.with(
+                            Indentation.SPACES2,
+                            lineEnding
                         )
                     ),
                     ProviderContexts.basic(
