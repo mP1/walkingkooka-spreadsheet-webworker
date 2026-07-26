@@ -42,6 +42,7 @@ import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlPath;
 import walkingkooka.net.UrlQueryString;
 import walkingkooka.net.email.EmailAddress;
+import walkingkooka.net.header.ETagComputers;
 import walkingkooka.net.header.MediaTypeDetectors;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
@@ -163,15 +164,13 @@ public final class Main implements EntryPoint {
             browserHttpServer(worker),
             (u) -> {
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
-                    EnvironmentContexts.empty(
-                        charset,
-                        currency,
-                        indentation,
-                        lineEnding,
-                        locale,
-                        now,
-                        Optional.of(user)
-                    )
+                    charset,
+                    currency,
+                    indentation,
+                    lineEnding,
+                    locale,
+                    now,
+                    Optional.of(user)
                 );
                 environmentContext.setEnvironmentValue(
                     SpreadsheetEnvironmentContext.SERVER_URL,
@@ -195,6 +194,11 @@ public final class Main implements EntryPoint {
                         metadataStore
                     ),
                     HateosHandlerContexts.basic(
+                        TextPrinting.with(
+                            Indentation.SPACES2,
+                            lineEnding
+                        ).setCharset(charset),
+                        ETagComputers.never(),
                         JsonNodeMarshallUnmarshallContexts.basic(
                             JsonNodeMarshallContexts.basic(),
                             JsonNodeUnmarshallContexts.basic(
@@ -202,15 +206,11 @@ public final class Main implements EntryPoint {
                                 currencyContext.setLocaleContext(localeContext), // CurrencyCodeLanguageTagContext
                                 MathContext.DECIMAL32
                             )
-                        ),
-                        TextPrinting.with(
-                            Indentation.SPACES2,
-                            lineEnding
                         )
                     ),
                     ProviderContexts.basic(
                         ConverterContexts.fake(),
-                        EnvironmentContexts.empty(
+                        EnvironmentContexts.map(
                             charset,
                             currency,
                             indentation,
