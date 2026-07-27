@@ -81,6 +81,7 @@ import walkingkooka.spreadsheet.server.SpreadsheetServerContext;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
+import walkingkooka.storage.StorageEnvironmentContexts;
 import walkingkooka.storage.Storages;
 import walkingkooka.terminal.server.TerminalServerContexts;
 import walkingkooka.text.CharSequences;
@@ -187,7 +188,7 @@ public final class Main implements EntryPoint {
                     currencyContext.setLocaleContext(localeContext),
                     SpreadsheetEnvironmentContexts.basic(
                         Storages.treeMapStore(),
-                        environmentContext
+                        StorageEnvironmentContexts.basic(environmentContext)
                     ),
                     SpreadsheetMetadataContexts.basic(
                         (uu, l) -> SpreadsheetMetadata.EMPTY,
