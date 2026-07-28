@@ -43,6 +43,7 @@ import walkingkooka.net.UrlPath;
 import walkingkooka.net.UrlQueryString;
 import walkingkooka.net.email.EmailAddress;
 import walkingkooka.net.header.ETagComputers;
+import walkingkooka.net.header.MediaTypeDetector;
 import walkingkooka.net.header.MediaTypeDetectors;
 import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
@@ -81,6 +82,7 @@ import walkingkooka.spreadsheet.server.SpreadsheetServerContext;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
+import walkingkooka.storage.StorageContexts;
 import walkingkooka.storage.StorageEnvironmentContexts;
 import walkingkooka.storage.Storages;
 import walkingkooka.terminal.server.TerminalServerContexts;
@@ -160,6 +162,8 @@ public final class Main implements EntryPoint {
             )
         );
 
+        final MediaTypeDetector mediaTypeDetector = MediaTypeDetectors.binary();
+
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             fileServer(),
             browserHttpServer(worker),
@@ -178,7 +182,7 @@ public final class Main implements EntryPoint {
                     Url.parseAbsolute("https://example.com")
                 );
                 return SpreadsheetServerContexts.basic(
-                    MediaTypeDetectors.binary(),
+                    mediaTypeDetector,
                     ExpressionNumberBinaryNumberConverterFunctions.multiply(),
                     SpreadsheetEngines.basic(),
                     (id) -> Optional.of(
@@ -210,17 +214,20 @@ public final class Main implements EntryPoint {
                         )
                     ),
                     ProviderContexts.basic(
-                        ConverterContexts.fake(),
-                        EnvironmentContexts.map(
-                            charset,
-                            currency,
-                            indentation,
-                            lineEnding,
-                            locale,
-                            now,
-                            Optional.of(user)
-                        ),
-                        PluginStores.treeMap()
+                        PluginStores.treeMap(),
+                        StorageContexts.basic(
+                            ConverterContexts.fake(),
+                            mediaTypeDetector,
+                            EnvironmentContexts.map(
+                                charset,
+                                currency,
+                                indentation,
+                                lineEnding,
+                                locale,
+                                now,
+                                Optional.of(user)
+                            )
+                        )
                     ),
                     TerminalServerContexts.fake()
                 );
