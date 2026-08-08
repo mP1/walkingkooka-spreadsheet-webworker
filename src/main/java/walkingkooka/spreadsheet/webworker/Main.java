@@ -24,7 +24,6 @@ import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 import jsinterop.base.Js;
 import walkingkooka.Cast;
-import walkingkooka.Either;
 import walkingkooka.collect.set.Sets;
 import walkingkooka.convert.ConverterContexts;
 import walkingkooka.currency.CurrencyCode;
@@ -39,17 +38,16 @@ import walkingkooka.locale.LocaleContext;
 import walkingkooka.locale.LocaleContexts;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
-import walkingkooka.net.UrlPath;
 import walkingkooka.net.UrlQueryString;
 import walkingkooka.net.email.EmailAddress;
 import walkingkooka.net.header.ETagComputers;
 import walkingkooka.net.header.MediaTypeDetector;
 import walkingkooka.net.header.MediaTypeDetectors;
-import walkingkooka.net.http.HttpStatus;
 import walkingkooka.net.http.HttpStatusCode;
 import walkingkooka.net.http.server.HttpHandler;
+import walkingkooka.net.http.server.HttpRequest;
+import walkingkooka.net.http.server.HttpResponse;
 import walkingkooka.net.http.server.HttpServer;
-import walkingkooka.net.http.server.WebFile;
 import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.net.http.server.hateos.HateosHandlerContexts;
 import walkingkooka.plugin.ProviderContext;
@@ -165,7 +163,7 @@ public final class Main implements EntryPoint {
         final MediaTypeDetector mediaTypeDetector = MediaTypeDetectors.binary();
 
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
-            fileServer(),
+            publicHttpHandler(),
             browserHttpServer(worker),
             (u) -> {
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
@@ -268,8 +266,17 @@ public final class Main implements EntryPoint {
     /**
      * A fileserver that always returns {@link HttpStatusCode#NOT_FOUND} for any requested file.
      */
-    private static Function<UrlPath, Either<WebFile, HttpStatus>> fileServer() {
-        return (p) -> Either.right(HttpStatusCode.NOT_FOUND.status());
+    private static HttpHandler<SpreadsheetServerContext> publicHttpHandler() {
+        return new HttpHandler<>() {
+            @Override
+            public void handle(final HttpRequest request,
+                               final HttpResponse response,
+                               final SpreadsheetServerContext context) {
+                response.setVersion(request.protocolVersion());
+                response.setStatus(HttpStatusCode.NOT_FOUND.status());
+                response.clearEntity();
+            }
+        };
     }
 
     /**
