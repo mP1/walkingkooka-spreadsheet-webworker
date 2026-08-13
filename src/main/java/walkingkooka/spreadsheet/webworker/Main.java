@@ -79,7 +79,9 @@ import walkingkooka.spreadsheet.server.SpreadsheetHttpServer;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContext;
 import walkingkooka.spreadsheet.server.SpreadsheetServerContexts;
 import walkingkooka.spreadsheet.server.SpreadsheetServerStartup;
+import walkingkooka.spreadsheet.storage.SpreadsheetStorageContext;
 import walkingkooka.spreadsheet.store.repo.SpreadsheetStoreRepositories;
+import walkingkooka.storage.Storage;
 import walkingkooka.storage.StorageContexts;
 import walkingkooka.storage.StorageEnvironmentContexts;
 import walkingkooka.storage.Storages;
@@ -162,6 +164,8 @@ public final class Main implements EntryPoint {
 
         final MediaTypeDetector mediaTypeDetector = MediaTypeDetectors.binary();
 
+        final Storage<SpreadsheetStorageContext> storage = Storages.treeMapStore();
+
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             publicHttpHandler(),
             browserHttpServer(worker),
@@ -189,7 +193,7 @@ public final class Main implements EntryPoint {
                     systemSpreadsheetProvider(),
                     currencyContext.setLocaleContext(localeContext),
                     SpreadsheetEnvironmentContexts.basic(
-                        Storages.treeMapStore(),
+                        storage,
                         StorageEnvironmentContexts.basic(environmentContext)
                     ),
                     SpreadsheetMetadataContexts.basic(
@@ -216,6 +220,7 @@ public final class Main implements EntryPoint {
                         StorageContexts.basic(
                             ConverterContexts.fake(),
                             mediaTypeDetector,
+                            Cast.to(storage),
                             EnvironmentContexts.map(
                                 charset,
                                 currency,
