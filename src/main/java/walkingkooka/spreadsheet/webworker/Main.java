@@ -31,6 +31,7 @@ import walkingkooka.currency.CurrencyContext;
 import walkingkooka.currency.CurrencyContexts;
 import walkingkooka.currency.CurrencyExchange;
 import walkingkooka.currency.CurrencyExchangeRater;
+import walkingkooka.currency.CurrencyExchangeRaterContext;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
@@ -141,9 +142,9 @@ public final class Main implements EntryPoint {
         final CurrencyContext currencyContext = CurrencyContexts.readOnly(
             CurrencyContexts.jre(
                 Currency.getInstance(locale),
-                new CurrencyExchangeRater() {
+                new CurrencyExchangeRater<>() {
                     @Override
-                    public Set<CurrencyExchange> currencyExchanges() {
+                    public Set<CurrencyExchange> currencyExchanges(final CurrencyExchangeRaterContext context) {
                         return Sets.of(
                             CurrencyExchange.with(
                                 CurrencyCode.parse("AUD"),
@@ -154,7 +155,8 @@ public final class Main implements EntryPoint {
 
                     @Override
                     public Optional<Number> currencyExchangeRate(final CurrencyExchange currencyExchange,
-                                                                 final Optional<LocalDateTime> dateTime) {
+                                                                 final Optional<LocalDateTime> dateTime,
+                                                                 final CurrencyExchangeRaterContext context) {
                         return Optional.empty();
                     }
                 },
