@@ -223,14 +223,16 @@ public final class Main implements EntryPoint {
                             ConverterContexts.fake(),
                             mediaTypeDetector,
                             Cast.to(storage),
-                            EnvironmentContexts.map(
-                                charset,
-                                currency,
-                                indentation,
-                                lineEnding,
-                                locale,
-                                now,
-                                Optional.of(user)
+                            StorageEnvironmentContexts.basic(
+                                EnvironmentContexts.map(
+                                    charset,
+                                    currency,
+                                    indentation,
+                                    lineEnding,
+                                    locale,
+                                    now,
+                                    Optional.of(user)
+                                )
                             )
                         )
                     ),
