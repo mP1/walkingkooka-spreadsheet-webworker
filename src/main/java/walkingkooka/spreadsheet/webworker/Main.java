@@ -212,6 +212,9 @@ public final class Main implements EntryPoint {
                             JsonNodeMarshallContexts.basic(),
                             JsonNodeUnmarshallContexts.basic(
                                 ExpressionNumberKind.DEFAULT,
+                                (String name)-> {
+                                    throw new UnsupportedOperationException();
+                                },
                                 currencyContext.setLocaleContext(localeContext), // CurrencyCodeLanguageTagContext
                                 MathContext.DECIMAL32
                             )
