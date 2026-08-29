@@ -254,6 +254,7 @@ public final class Main implements EntryPoint {
         );
 
         return SpreadsheetProviders.basic(
+            SpreadsheetComparatorProviders.spreadsheetComparators(),
             SpreadsheetConvertersConverterProviders.spreadsheetConverters(
                 (ProviderContext p) -> SpreadsheetMetadata.EMPTY.set(
                     SpreadsheetMetadataPropertyName.LOCALE,
@@ -264,9 +265,8 @@ public final class Main implements EntryPoint {
                     p
                 )
             ), // converterProvider
-            SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(SpreadsheetStrings.CASE_SENSITIVITY),
-            SpreadsheetComparatorProviders.spreadsheetComparators(),
             SpreadsheetExporterProviders.spreadsheetExport(),
+            SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(SpreadsheetStrings.CASE_SENSITIVITY),
             spreadsheetFormatterProvider,
             FormHandlerProviders.validation(),
             SpreadsheetImporterProviders.spreadsheetImport(),
