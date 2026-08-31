@@ -32,6 +32,7 @@ import walkingkooka.currency.CurrencyContexts;
 import walkingkooka.currency.CurrencyExchange;
 import walkingkooka.currency.CurrencyExchangeRater;
 import walkingkooka.currency.CurrencyExchangeRaterContext;
+import walkingkooka.currency.provider.CurrencyExchangeRaterProviders;
 import walkingkooka.datetime.HasNow;
 import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
@@ -265,6 +266,7 @@ public final class Main implements EntryPoint {
                     p
                 )
             ), // converterProvider
+            CurrencyExchangeRaterProviders.empty(),
             SpreadsheetExporterProviders.spreadsheetExport(),
             SpreadsheetExpressionFunctionProviders.expressionFunctionProvider(SpreadsheetStrings.CASE_SENSITIVITY),
             spreadsheetFormatterProvider,
