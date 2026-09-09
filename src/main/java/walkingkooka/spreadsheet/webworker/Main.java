@@ -54,7 +54,6 @@ import walkingkooka.net.http.server.browser.BrowserHttpServers;
 import walkingkooka.net.http.server.hateos.HateosHandlerContexts;
 import walkingkooka.plugin.ProviderContext;
 import walkingkooka.plugin.ProviderContexts;
-import walkingkooka.plugin.store.PluginStores;
 import walkingkooka.predicate.Predicates;
 import walkingkooka.spreadsheet.SpreadsheetStrings;
 import walkingkooka.spreadsheet.compare.provider.SpreadsheetComparatorProviders;
@@ -230,7 +229,6 @@ public final class Main implements EntryPoint {
                         )
                     ),
                     ProviderContexts.basic(
-                        PluginStores.treeMap(),
                         StorageContexts.basic(
                             ConverterContexts.fake(),
                             mediaTypeDetector,
