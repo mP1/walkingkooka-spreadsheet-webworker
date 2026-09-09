@@ -160,6 +160,14 @@ public final class Main implements EntryPoint {
                                                                  final CurrencyExchangeRaterContext context) {
                         return Optional.empty();
                     }
+
+                    @Override
+                    public Set<CurrencyExchange> findCurrencyExchangeByText(final String text,
+                                                                            final int offset,
+                                                                            final int count,
+                                                                            final CurrencyExchangeRaterContext context) {
+                        return Sets.empty();
+                    }
                 },
                 localeContext
             )
