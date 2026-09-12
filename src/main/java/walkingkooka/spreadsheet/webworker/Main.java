@@ -38,6 +38,8 @@ import walkingkooka.environment.EnvironmentContext;
 import walkingkooka.environment.EnvironmentContexts;
 import walkingkooka.locale.LocaleContext;
 import walkingkooka.locale.LocaleContexts;
+import walkingkooka.logging.CanLogs;
+import walkingkooka.logging.LoggingLevel;
 import walkingkooka.net.Url;
 import walkingkooka.net.UrlParameterName;
 import walkingkooka.net.UrlQueryString;
@@ -134,6 +136,7 @@ public final class Main implements EntryPoint {
         final Currency currency = Currency.getInstance(locale);
         final Indentation indentation = Indentation.SPACES2;
         final LineEnding lineEnding = LineEnding.NL;
+        final LoggingLevel loggingLevel = LoggingLevel.NONE;
         final HasNow now = LocalDateTime::now;
         final EmailAddress user = EmailAddress.parse("user@example.com");
         final SpreadsheetMetadataStore metadataStore = SpreadsheetMetadataStores.treeMap();
@@ -181,11 +184,13 @@ public final class Main implements EntryPoint {
             browserHttpServer(worker),
             (u) -> {
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
+                    CanLogs.nullCanLog(),
                     charset,
                     currency,
                     indentation,
                     lineEnding,
                     locale,
+                    loggingLevel,
                     now,
                     Optional.of(user)
                 );
@@ -235,11 +240,13 @@ public final class Main implements EntryPoint {
                             Cast.to(storage),
                             StorageEnvironmentContexts.basic(
                                 EnvironmentContexts.map(
+                                    CanLogs.nullCanLog(),
                                     charset,
                                     currency,
                                     indentation,
                                     lineEnding,
                                     locale,
+                                    loggingLevel,
                                     now,
                                     Optional.of(user)
                                 )
