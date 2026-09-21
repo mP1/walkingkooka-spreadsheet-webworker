@@ -231,7 +231,8 @@ public final class Main implements EntryPoint {
                                 currencyContext.setLocaleContext(localeContext), // CurrencyCodeLanguageTagContext
                                 MathContext.DECIMAL32
                             )
-                        )
+                        ),
+                        environmentContext // LoggingContext
                     ),
                     ProviderContexts.basic(
                         StorageContexts.basic(
