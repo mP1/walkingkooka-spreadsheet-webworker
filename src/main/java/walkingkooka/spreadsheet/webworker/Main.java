@@ -69,6 +69,7 @@ import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProvider;
 import walkingkooka.spreadsheet.format.provider.SpreadsheetFormatterProviders;
 import walkingkooka.spreadsheet.importer.provider.SpreadsheetImporterProviders;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadata;
+import walkingkooka.spreadsheet.meta.SpreadsheetMetadataContext;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataContexts;
 import walkingkooka.spreadsheet.meta.SpreadsheetMetadataPropertyName;
 import walkingkooka.spreadsheet.meta.store.SpreadsheetMetadataStore;
@@ -179,6 +180,11 @@ public final class Main implements EntryPoint {
 
         final Storage<SpreadsheetStorageContext> storage = Storages.treeMapStore();
 
+        final SpreadsheetMetadataContext spreadsheetMetadataContext = SpreadsheetMetadataContexts.basic(
+            (uu, l) -> SpreadsheetMetadata.EMPTY,
+            metadataStore
+        );
+
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             publicHttpHandler(),
             browserHttpServer(worker),
@@ -208,13 +214,11 @@ public final class Main implements EntryPoint {
                     systemSpreadsheetProvider(),
                     currencyContext.setLocaleContext(localeContext),
                     SpreadsheetEnvironmentContexts.basic(
+                        spreadsheetMetadataContext, // SpreadsheetMetadataLoader
                         storage,
                         StorageEnvironmentContexts.basic(environmentContext)
                     ),
-                    SpreadsheetMetadataContexts.basic(
-                        (uu, l) -> SpreadsheetMetadata.EMPTY,
-                        metadataStore
-                    ),
+                    spreadsheetMetadataContext,
                     HateosHandlerContexts.basic(
                         TextPrinting.with(
                             Indentation.SPACES2,
