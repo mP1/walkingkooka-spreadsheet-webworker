@@ -188,17 +188,19 @@ public final class Main implements EntryPoint {
         final SpreadsheetHttpServer server = SpreadsheetHttpServer.with(
             publicHttpHandler(),
             browserHttpServer(worker),
-            (u) -> {
+            (final Optional<EmailAddress> optionalUser, final Optional<Locale> optionalLocale) -> {
+                final Locale selectedLocale = optionalLocale.orElse(locale);
+
                 final EnvironmentContext environmentContext = EnvironmentContexts.map(
                     CanLogs.nullCanLog(),
                     charset,
                     currency,
                     indentation,
                     lineEnding,
-                    locale,
+                    selectedLocale,
                     loggingLevel,
                     now,
-                    Optional.of(user)
+                    optionalUser
                 );
                 environmentContext.setEnvironmentValue(
                     SpreadsheetEnvironmentContext.SERVER_URL,
@@ -250,10 +252,10 @@ public final class Main implements EntryPoint {
                                     currency,
                                     indentation,
                                     lineEnding,
-                                    locale,
+                                    selectedLocale,
                                     loggingLevel,
                                     now,
-                                    Optional.of(user)
+                                    optionalUser
                                 )
                             )
                         )
